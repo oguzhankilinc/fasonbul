@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  role         String   @default("JOB_OWNER") // JOB_OWNER, MANUFACTURER, ADMIN
+  name         String
+  companyName  String?
+  email        String   @unique
+  phone        String?
+  city         String?
+  passwordHash String
+  resetToken   String?
+  resetTokenExpiry DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  jobRequests  JobRequest[]
+  contactViews ContactView[]
+}
+
+model JobRequest {
+  id          String    @id @default(cuid())
+  ownerId     String
+  sector      String
+  city        String
+  title       String
+  description String
+  phone       String
+  whatsapp    String
+  urgency     String?
+  status      String    @default("PENDING_APPROVAL") // DRAFT, PENDING_APPROVAL, ACTIVE, PASSIVE, EXPIRED, REJECTED
+  isFeatured  Boolean   @default(false) // Admin can mark listings for homepage showcase
+  approvedAt  DateTime?
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  owner        User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  contactViews ContactView[]
+
+  @@index([status])
+  @@index([sector])
+  @@index([city])
+  @@index([ownerId])
+  @@index([isFeatured])
+}
+
+model ContactView {
+  id           String   @id @default(cuid())
+  jobRequestId String
+  userId       String
+  actionType   String   // PHONE_VIEW, WHATSAPP_CLICK
+  createdAt    DateTime @default(now())
+
+  jobRequest JobRequest @relation(fields: [jobRequestId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([jobRequestId])
+  @@index([userId])
+}

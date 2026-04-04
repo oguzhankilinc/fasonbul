@@ -1,0 +1,299 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --background-alt: #fafafa;
+  --foreground: #111827;
+  --primary: #f97316;
+  --primary-hover: #ea580c;
+  --primary-light: #fff7ed;
+  --primary-dark: #c2410c;
+  --secondary: #6b7280;
+  --secondary-light: #9ca3af;
+  --border: #e5e7eb;
+  --border-light: #f3f4f6;
+  --muted: #f9fafb;
+  --success: #10b981;
+  --success-light: #d1fae5;
+  --error: #ef4444;
+  --error-light: #fee2e2;
+  --warning: #f59e0b;
+  --warning-light: #fef3c7;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-background-alt: var(--background-alt);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-light: var(--primary-light);
+  --color-primary-dark: var(--primary-dark);
+  --color-secondary: var(--secondary);
+  --color-secondary-light: var(--secondary-light);
+  --color-border: var(--border);
+  --color-border-light: var(--border-light);
+  --color-muted: var(--muted);
+  --color-success: var(--success);
+  --color-success-light: var(--success-light);
+  --color-error: var(--error);
+  --color-error-light: var(--error-light);
+  --color-warning: var(--warning);
+  --color-warning-light: var(--warning-light);
+  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==================== BUTTONS ==================== */
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 hover:bg-primary-hover hover:shadow-md active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none;
+}
+
+.btn-primary-lg {
+  @apply inline-flex items-center justify-center gap-2 bg-primary text-white px-8 py-4 rounded-2xl font-semibold text-base transition-all duration-200 hover:bg-primary-hover hover:shadow-md active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center gap-2 bg-white text-foreground border-2 border-border px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 hover:border-primary hover:text-primary hover:bg-primary-light focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-ghost {
+  @apply inline-flex items-center justify-center gap-2 text-secondary px-4 py-2 rounded-xl font-medium text-sm transition-all duration-200 hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
+}
+
+.btn-danger {
+  @apply inline-flex items-center justify-center gap-2 bg-error text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-error focus:ring-offset-2;
+}
+
+/* ==================== FORM ELEMENTS ==================== */
+.input {
+  @apply w-full px-4 py-3 border-2 border-border rounded-xl bg-white text-foreground placeholder:text-secondary-light focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200;
+}
+
+.select {
+  @apply w-full px-4 py-3 border-2 border-border rounded-xl bg-white text-foreground focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200 appearance-none cursor-pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+.label {
+  @apply block text-sm font-semibold text-foreground mb-2;
+}
+
+.textarea {
+  @apply w-full px-4 py-3 border-2 border-border rounded-xl bg-white text-foreground placeholder:text-secondary-light focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200 resize-none min-h-[120px];
+}
+
+/* ==================== CARDS ==================== */
+.card {
+  @apply bg-white border border-border rounded-2xl p-6 shadow-sm transition-all duration-200;
+}
+
+.card-hover {
+  @apply bg-white border border-border rounded-2xl p-6 shadow-sm transition-all duration-300 hover:shadow-lg hover:border-primary/40 hover:-translate-y-1;
+}
+
+.card-highlight {
+  @apply bg-white rounded-2xl p-6 shadow-sm transition-all duration-200 border-2 border-primary/20 bg-gradient-to-br from-white via-white to-primary-light/40;
+}
+
+.card-featured {
+  @apply bg-white rounded-2xl p-6 shadow-md transition-all duration-300 border-2 border-primary/30 bg-gradient-to-br from-white via-primary-light/10 to-primary-light/30 hover:shadow-xl hover:border-primary/50 hover:-translate-y-1;
+}
+
+/* ==================== BADGES ==================== */
+.badge {
+  @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold tracking-wide;
+}
+
+.badge-primary {
+  @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold tracking-wide bg-primary-light text-primary-dark border border-primary/20;
+}
+
+.badge-success {
+  @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold tracking-wide bg-success-light text-green-700 border border-success/20;
+}
+
+.badge-warning {
+  @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold tracking-wide bg-warning-light text-amber-700 border border-warning/20;
+}
+
+.badge-error {
+  @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold tracking-wide bg-error-light text-red-700 border border-error/20;
+}
+
+.badge-secondary {
+  @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold tracking-wide bg-gray-100 text-gray-700 border border-gray-200;
+}
+
+.badge-outline {
+  @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold tracking-wide bg-transparent border-2;
+}
+
+/* ==================== FILTER BOX ==================== */
+.filter-box {
+  @apply bg-gradient-to-br from-white via-white to-primary-light/30 border-2 border-primary/10 rounded-2xl p-6 shadow-md;
+}
+
+.filter-select {
+  @apply w-full px-4 py-3.5 border-2 border-border rounded-xl bg-white text-foreground font-medium focus:outline-none focus:ring-0 focus:border-primary focus:shadow-sm transition-all duration-200 appearance-none cursor-pointer hover:border-primary/50 hover:shadow-sm;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23f97316' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+/* ==================== SECTION STYLES ==================== */
+.section-header {
+  @apply flex items-center justify-between mb-8;
+}
+
+.section-title {
+  @apply text-2xl md:text-3xl font-bold text-foreground tracking-tight;
+}
+
+.section-subtitle {
+  @apply text-secondary mt-2 text-base;
+}
+
+/* ==================== HERO STYLES ==================== */
+.hero-gradient {
+  @apply bg-gradient-to-br from-primary-light via-white to-orange-50/80;
+}
+
+/* ==================== HIGHLIGHT BOX ==================== */
+.highlight-box {
+  @apply bg-white border-2 border-primary/15 rounded-2xl p-5 flex items-center gap-4 shadow-sm hover:shadow-md hover:border-primary/30 hover:bg-primary-light/30 transition-all duration-300;
+}
+
+.highlight-icon {
+  @apply flex-shrink-0 w-12 h-12 bg-gradient-to-br from-primary/10 to-primary/20 rounded-xl flex items-center justify-center text-primary;
+}
+
+.highlight-text {
+  @apply font-bold text-sm md:text-base text-foreground leading-tight;
+}
+
+/* ==================== TRUST BADGE ==================== */
+.trust-badge {
+  @apply inline-flex items-center gap-2 px-4 py-2 bg-success-light text-green-700 rounded-full text-sm font-semibold border border-success/20;
+}
+
+/* ==================== CONTAINER ==================== */
+.container-custom {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* ==================== LINK STYLES ==================== */
+a {
+  @apply transition-colors duration-200;
+}
+
+.link-primary {
+  @apply text-primary hover:text-primary-hover font-medium;
+}
+
+/* ==================== SKELETON LOADING ==================== */
+.skeleton {
+  @apply animate-pulse bg-gray-200 rounded-lg;
+}
+
+/* ==================== PAGINATION ==================== */
+.pagination-btn {
+  @apply inline-flex items-center justify-center w-10 h-10 rounded-xl border-2 border-border text-sm font-medium transition-all duration-200 hover:border-primary hover:text-primary;
+}
+
+.pagination-btn-active {
+  @apply inline-flex items-center justify-center w-10 h-10 rounded-xl border-2 text-sm font-medium transition-all duration-200 bg-primary border-primary text-white hover:bg-primary-hover hover:border-primary-hover hover:text-white;
+}
+
+/* ==================== DIVIDER ==================== */
+.divider {
+  @apply border-t border-border my-8;
+}
+
+/* ==================== STATS ==================== */
+.stat-card {
+  @apply bg-white/80 backdrop-blur-sm border border-border rounded-2xl p-6 shadow-sm transition-all duration-300 text-center hover:shadow-md hover:bg-white;
+}
+
+.stat-value {
+  @apply text-3xl md:text-4xl font-bold text-foreground tracking-tight;
+}
+
+.stat-label {
+  @apply text-sm text-secondary mt-2 font-medium;
+}
+
+/* ==================== SECTOR CARD ==================== */
+.sector-card {
+  @apply bg-white border border-border rounded-2xl p-6 text-center transition-all duration-300 hover:shadow-lg hover:border-primary/40 hover:-translate-y-1 cursor-pointer;
+}
+
+.sector-card:hover .sector-icon {
+  transform: scale(1.1);
+}
+
+.sector-card:hover .sector-label {
+  color: var(--primary);
+}
+
+.sector-icon {
+  @apply text-4xl mb-3 transition-transform duration-300;
+}
+
+.sector-label {
+  @apply text-sm font-semibold text-foreground transition-colors;
+}
+
+/* ==================== CTA SECTION ==================== */
+.cta-primary {
+  @apply inline-flex items-center justify-center gap-3 bg-gradient-to-r from-primary to-primary-hover text-white px-10 py-5 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-4 focus:ring-primary/30;
+}
+
+.cta-secondary {
+  @apply inline-flex items-center justify-center gap-2 bg-white text-foreground border-2 border-border px-8 py-4 rounded-2xl font-semibold text-base transition-all duration-300 hover:border-primary hover:text-primary hover:bg-primary-light hover:shadow-md;
+}
+
+/* ==================== ANIMATIONS ==================== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* ==================== SCROLLBAR ==================== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-muted;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-border rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-secondary;
+}
