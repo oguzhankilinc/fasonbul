@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 
 interface ImageUploadProps {
   onImageUploaded: (imageUrl: string) => void;
+  onUploadingChange?: (isUploading: boolean) => void;
   currentImage?: string | null;
 }
 
@@ -11,7 +12,7 @@ interface ImageUploadProps {
  * Reliable image upload component for job photos.
  * Uses native <img> for preview to ensure compatibility with data URLs and server URLs.
  */
-export default function ImageUpload({ onImageUploaded, currentImage }: ImageUploadProps) {
+export default function ImageUpload({ onImageUploaded, onUploadingChange, currentImage }: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(currentImage || null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,6 +39,7 @@ export default function ImageUpload({ onImageUploaded, currentImage }: ImageUplo
     setError(null);
     setImageError(false);
     setUploading(true);
+    onUploadingChange?.(true);
 
     // Show preview immediately using data URL
     const reader = new FileReader();
@@ -71,6 +73,7 @@ export default function ImageUpload({ onImageUploaded, currentImage }: ImageUplo
       onImageUploaded("");
     } finally {
       setUploading(false);
+      onUploadingChange?.(false);
     }
   };
 
