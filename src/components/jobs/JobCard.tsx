@@ -31,6 +31,7 @@ interface JobCardProps {
 
 export default function JobCard({ job, featured = false }: JobCardProps) {
   const [imageError, setImageError] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const remainingDays = getRemainingDays(job.expiresAt);
   const isUrgent = job.urgency && job.urgency !== "normal";
 
@@ -49,13 +50,26 @@ export default function JobCard({ job, featured = false }: JobCardProps) {
         {/* Job Image */}
         <div className="relative aspect-[16/9] w-full bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
           {hasValidImage ? (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img
-              src={job.imageUrl!}
-              alt={job.title}
-              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              onError={() => setImageError(true)}
-            />
+            <>
+              {/* Show fallback while loading */}
+              {!imageLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-5xl opacity-60" role="img" aria-label={getSectorLabel(job.sector)}>
+                    {getSectorIcon(job.sector)}
+                  </span>
+                </div>
+              )}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={job.imageUrl!}
+                alt={job.title}
+                className={`absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-500 ${
+                  imageLoaded ? "opacity-100" : "opacity-0"
+                }`}
+                onLoad={() => setImageLoaded(true)}
+                onError={() => setImageError(true)}
+              />
+            </>
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
               <span className="text-5xl opacity-60" role="img" aria-label={getSectorLabel(job.sector)}>
