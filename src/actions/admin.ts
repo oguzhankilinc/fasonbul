@@ -225,3 +225,41 @@ export async function toggleFeatured(jobId: string): Promise<AdminState> {
 
   return { success: true };
 }
+
+export async function extendJobDuration(jobId: string, days: number = 30): Promise<AdminState> {
+  try {
+    await requireAdmin();
+  } catch {
+    return { error: "Bu işlem için yetkiniz yok." };
+  }
+
+  const job = await prisma.jobRequest.findUnique({
+    where: { id: jobId },
+  });
+
+  if (!job) {
+    return { error: "İlan bulunamadı." };
+  }
+
+  // Calculate new expiry date
+  const now = new Date();
+  const currentExpiry = job.expiresAt || now;
+  const baseDate = currentExpiry > now ? currentExpiry : now;
+  const newExpiresAt = new Date(baseDate.getTime() + days * 24 * 60 * 60 * 1000);
+
+  await prisma.jobRequest.update({
+    where: { id: jobId },
+    data: {
+      expiresAt: newExpiresAt,
+      // If expired, reactivate it
+      status: job.status === JOB_STATUS.EXPIRED ? JOB_STATUS.ACTIVE : job.status,
+    },
+  });
+
+  revalidatePath("/admin/aktif");
+  revalidatePath("/admin/suresi-dolan");
+  revalidatePath("/");
+  revalidatePath(`/ilan/${jobId}`);
+
+  return { success: true };
+}

@@ -2,7 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    unoptimized: process.env.NODE_ENV === "development",
+    // Use unoptimized images for local file uploads
+    // This avoids issues with base64 data URLs and ephemeral file storage
+    unoptimized: true,
   },
   experimental: {
     serverActions: {

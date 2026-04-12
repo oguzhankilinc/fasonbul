@@ -32,7 +32,7 @@ export default async function ExpiredJobsPage() {
           <p className="text-secondary">Süresi dolmuş ilan bulunmuyor.</p>
         </div>
       ) : (
-        <AdminJobList jobs={jobs} showSetActive />
+        <AdminJobList jobs={jobs} showSetActive showExtendDuration />
       )}
     </div>
   );

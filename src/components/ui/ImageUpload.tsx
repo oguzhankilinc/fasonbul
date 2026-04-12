@@ -12,6 +12,7 @@ export default function ImageUpload({ onImageUploaded, currentImage }: ImageUplo
   const [preview, setPreview] = useState<string | null>(currentImage || null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [imageError, setImageError] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,6 +33,7 @@ export default function ImageUpload({ onImageUploaded, currentImage }: ImageUplo
     }
 
     setError(null);
+    setImageError(false);
     setUploading(true);
 
     // Show preview immediately
@@ -57,6 +59,8 @@ export default function ImageUpload({ onImageUploaded, currentImage }: ImageUplo
         throw new Error(data.error || "Yükleme başarısız");
       }
 
+      // Update preview to use the actual URL after successful upload
+      setPreview(data.imageUrl);
       onImageUploaded(data.imageUrl);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Yükleme başarısız");
@@ -68,11 +72,19 @@ export default function ImageUpload({ onImageUploaded, currentImage }: ImageUplo
 
   const handleRemove = () => {
     setPreview(null);
+    setImageError(false);
     onImageUploaded("");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
+  // Check if preview is a data URL (base64) or a file path
+  const isDataUrl = preview?.startsWith("data:");
 
   return (
     <div className="space-y-3">
@@ -86,7 +98,7 @@ export default function ImageUpload({ onImageUploaded, currentImage }: ImageUplo
         id="job-image-upload"
       />
 
-      {preview ? (
+      {preview && !imageError ? (
         <div className="relative">
           <div className="relative aspect-[3/2] w-full max-w-md rounded-xl overflow-hidden border border-border bg-gray-50">
             <Image
@@ -94,6 +106,8 @@ export default function ImageUpload({ onImageUploaded, currentImage }: ImageUplo
               alt="İlan görseli önizleme"
               fill
               className="object-cover"
+              unoptimized={isDataUrl}
+              onError={handleImageError}
             />
             {uploading && (
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
@@ -112,6 +126,28 @@ export default function ImageUpload({ onImageUploaded, currentImage }: ImageUplo
             onClick={handleRemove}
             className="absolute top-2 right-2 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg transition-colors"
             disabled={uploading}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      ) : preview && imageError ? (
+        // Broken image fallback - allow re-upload
+        <div className="relative">
+          <div className="relative aspect-[3/2] w-full max-w-md rounded-xl overflow-hidden border-2 border-dashed border-amber-300 bg-amber-50 flex items-center justify-center">
+            <div className="text-center p-4">
+              <svg className="w-10 h-10 text-amber-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <p className="text-sm font-medium text-amber-700">Görsel yüklenemedi</p>
+              <p className="text-xs text-amber-600 mt-1">Dosya mevcut değil veya bozuk</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleRemove}
+            className="absolute top-2 right-2 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

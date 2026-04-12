@@ -2,8 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { getSectorLabel, getCityLabel } from "@/lib/constants";
-import { formatRelativeDate, truncateText } from "@/lib/utils";
+import Image from "next/image";
+import { getSectorLabel, getCityLabel, getSectorIcon } from "@/lib/constants";
+import { formatRelativeDate, truncateText, getRemainingDays } from "@/lib/utils";
 import {
   approveJob,
   rejectJob,
@@ -11,6 +12,7 @@ import {
   setJobActive,
   deleteJobAdmin,
   toggleFeatured,
+  extendJobDuration,
 } from "@/actions/admin";
 
 interface Job {
@@ -20,7 +22,9 @@ interface Job {
   sector: string;
   city: string;
   phone: string;
+  imageUrl?: string | null;
   createdAt: Date;
+  expiresAt?: Date | null;
   isFeatured?: boolean;
   owner: {
     name: string;
@@ -35,6 +39,7 @@ interface AdminJobListProps {
   showSetPassive?: boolean;
   showSetActive?: boolean;
   showFeaturedToggle?: boolean;
+  showExtendDuration?: boolean;
 }
 
 export default function AdminJobList({
@@ -43,6 +48,7 @@ export default function AdminJobList({
   showSetPassive,
   showSetActive,
   showFeaturedToggle,
+  showExtendDuration,
 }: AdminJobListProps) {
   const router = useRouter();
 
@@ -86,131 +92,163 @@ export default function AdminJobList({
     router.refresh();
   };
 
+  const handleExtendDuration = async (jobId: string) => {
+    if (confirm("Bu ilanın süresini 30 gün uzatmak istediğinize emin misiniz?")) {
+      await extendJobDuration(jobId, 30);
+      router.refresh();
+    }
+  };
+
   return (
     <div className="space-y-4">
-      {jobs.map((job) => (
-        <div key={job.id} className={`card ${job.isFeatured ? 'border-primary/30 bg-gradient-to-br from-white to-primary-light/20' : ''}`}>
-          <div className="flex flex-col gap-4">
-            {/* Header */}
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
-                <div className="flex flex-wrap items-center gap-2 mb-2">
-                  <span className="badge-primary">{getSectorLabel(job.sector)}</span>
-                  <span className="badge-secondary">{getCityLabel(job.city)}</span>
-                  {job.isFeatured && (
-                    <span className="badge-warning">Vitrin</span>
+      {jobs.map((job) => {
+        const remainingDays = job.expiresAt ? getRemainingDays(job.expiresAt) : null;
+
+        return (
+          <div key={job.id} className={`card ${job.isFeatured ? 'border-primary/30 bg-gradient-to-br from-white to-primary-light/20' : ''}`}>
+            <div className="flex flex-col md:flex-row gap-4">
+              {/* Image Thumbnail */}
+              <div className="flex-shrink-0">
+                <div className="relative w-full md:w-32 h-24 rounded-lg overflow-hidden bg-gray-100">
+                  {job.imageUrl ? (
+                    <Image
+                      src={job.imageUrl}
+                      alt={job.title}
+                      fill
+                      className="object-cover"
+                      unoptimized
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const parent = target.parentElement;
+                        if (parent) {
+                          parent.innerHTML = `<div class="w-full h-full flex items-center justify-center bg-gray-100"><span class="text-3xl opacity-50">${getSectorIcon(job.sector)}</span></div>`;
+                        }
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-3xl opacity-50">{getSectorIcon(job.sector)}</span>
+                    </div>
                   )}
                 </div>
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 min-w-0">
+                {/* Header */}
+                <div className="flex flex-wrap items-center gap-2 mb-2">
+                  <span className="badge-primary text-xs">{getSectorLabel(job.sector)}</span>
+                  <span className="badge-secondary text-xs">{getCityLabel(job.city)}</span>
+                  {job.isFeatured && (
+                    <span className="badge-warning text-xs">Vitrin</span>
+                  )}
+                  {remainingDays !== null && remainingDays <= 7 && remainingDays > 0 && (
+                    <span className="badge-error text-xs">{remainingDays} gün kaldı</span>
+                  )}
+                  {remainingDays !== null && remainingDays <= 0 && (
+                    <span className="badge-error text-xs">Süresi doldu</span>
+                  )}
+                </div>
+
                 <Link
                   href={`/ilan/${job.id}`}
-                  className="text-lg font-semibold text-foreground hover:text-primary"
+                  className="text-base font-semibold text-foreground hover:text-primary block truncate"
+                  target="_blank"
                 >
                   {job.title}
                 </Link>
-                <p className="text-sm text-secondary mt-1">
-                  {truncateText(job.description, 200)}
+
+                <p className="text-sm text-secondary mt-1 line-clamp-2">
+                  {truncateText(job.description, 150)}
                 </p>
-              </div>
-            </div>
 
-            {/* Owner Info */}
-            <div className="flex flex-wrap gap-4 text-sm text-secondary border-t border-border pt-4">
-              <span>
-                <strong>İlan Sahibi:</strong>{" "}
-                {job.owner.companyName || job.owner.name}
-              </span>
-              <span>
-                <strong>E-posta:</strong> {job.owner.email}
-              </span>
-              <span>
-                <strong>Telefon:</strong> {job.phone}
-              </span>
-              <span>
-                <strong>Tarih:</strong> {formatRelativeDate(job.createdAt)}
-              </span>
-            </div>
+                {/* Owner Info - Compact */}
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-secondary mt-2">
+                  <span>{job.owner.companyName || job.owner.name}</span>
+                  <span>{job.phone}</span>
+                  <span>{formatRelativeDate(job.createdAt)}</span>
+                </div>
 
-            {/* Actions */}
-            <div className="flex flex-wrap gap-2 pt-2">
-              {showApproveReject && (
-                <>
-                  <button
-                    onClick={() => handleApprove(job.id)}
-                    className="btn-primary text-sm py-1.5"
-                  >
-                    Onayla
-                  </button>
-                  <button
-                    onClick={() => handleReject(job.id)}
-                    className="btn-secondary text-sm py-1.5 text-error"
-                  >
-                    Reddet
-                  </button>
-                </>
-              )}
-
-              {showFeaturedToggle && (
-                <button
-                  onClick={() => handleToggleFeatured(job.id)}
-                  className={`btn-secondary text-sm py-1.5 ${
-                    job.isFeatured
-                      ? "text-warning border-warning hover:bg-warning-light"
-                      : "text-primary border-primary hover:bg-primary-light"
-                  }`}
-                >
-                  {job.isFeatured ? (
+                {/* Actions */}
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {showApproveReject && (
                     <>
-                      <svg className="w-4 h-4 mr-1 inline" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      Vitrinden Kaldır
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-4 h-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                      </svg>
-                      Vitrine Ekle
+                      <button
+                        onClick={() => handleApprove(job.id)}
+                        className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-green-500 hover:bg-green-600 text-white transition-colors"
+                      >
+                        Onayla
+                      </button>
+                      <button
+                        onClick={() => handleReject(job.id)}
+                        className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-500 hover:bg-red-600 text-white transition-colors"
+                      >
+                        Reddet
+                      </button>
                     </>
                   )}
-                </button>
-              )}
 
-              {showSetPassive && (
-                <button
-                  onClick={() => handleSetPassive(job.id)}
-                  className="btn-secondary text-sm py-1.5"
-                >
-                  Pasife Al
-                </button>
-              )}
+                  {showFeaturedToggle && (
+                    <button
+                      onClick={() => handleToggleFeatured(job.id)}
+                      className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                        job.isFeatured
+                          ? "bg-amber-100 text-amber-700 hover:bg-amber-200"
+                          : "bg-primary-light text-primary hover:bg-primary/20"
+                      }`}
+                    >
+                      {job.isFeatured ? "Vitrinden Çıkar" : "Vitrine Ekle"}
+                    </button>
+                  )}
 
-              {showSetActive && (
-                <button
-                  onClick={() => handleSetActive(job.id)}
-                  className="btn-secondary text-sm py-1.5"
-                >
-                  Aktif Et
-                </button>
-              )}
+                  {showSetPassive && (
+                    <button
+                      onClick={() => handleSetPassive(job.id)}
+                      className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
+                    >
+                      Pasife Al
+                    </button>
+                  )}
 
-              <Link
-                href={`/ilan/${job.id}`}
-                className="btn-secondary text-sm py-1.5"
-              >
-                Görüntüle
-              </Link>
+                  {showSetActive && (
+                    <button
+                      onClick={() => handleSetActive(job.id)}
+                      className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-green-100 hover:bg-green-200 text-green-700 transition-colors"
+                    >
+                      Aktif Et
+                    </button>
+                  )}
 
-              <button
-                onClick={() => handleDelete(job.id)}
-                className="btn-secondary text-sm py-1.5 text-error hover:bg-red-50"
-              >
-                Sil
-              </button>
+                  {showExtendDuration && (
+                    <button
+                      onClick={() => handleExtendDuration(job.id)}
+                      className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-700 transition-colors"
+                    >
+                      +30 Gün Uzat
+                    </button>
+                  )}
+
+                  <Link
+                    href={`/ilan/${job.id}`}
+                    target="_blank"
+                    className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
+                  >
+                    Görüntüle
+                  </Link>
+
+                  <button
+                    onClick={() => handleDelete(job.id)}
+                    className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-colors"
+                  >
+                    Sil
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

@@ -42,7 +42,7 @@ export default async function ActiveJobsPage() {
           <p className="text-secondary">Aktif ilan bulunmuyor.</p>
         </div>
       ) : (
-        <AdminJobList jobs={jobs} showSetPassive showFeaturedToggle />
+        <AdminJobList jobs={jobs} showSetPassive showFeaturedToggle showExtendDuration />
       )}
     </div>
   );
