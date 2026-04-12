@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { JOB_STATUS } from "@/lib/constants";
-import AdminJobList from "../components/AdminJobList";
+import AdminJobList from "../../components/AdminJobList";
 
 export const metadata = {
   title: "Süresi Dolan İlanlar",
