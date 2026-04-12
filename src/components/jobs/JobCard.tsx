@@ -9,7 +9,7 @@ import {
   getSectorIcon,
 } from "@/lib/constants";
 import { formatRelativeDate, getRemainingDays, truncateText } from "@/lib/utils";
-import { isValidImageUrl } from "@/lib/image-utils";
+import { isValidImageUrl, normalizeImageUrl } from "@/lib/image-utils";
 
 interface Job {
   id: string;
@@ -35,8 +35,10 @@ export default function JobCard({ job, featured = false }: JobCardProps) {
   const remainingDays = getRemainingDays(job.expiresAt);
   const isUrgent = job.urgency && job.urgency !== "normal";
 
+  // Normalize legacy paths to API paths, returns null if invalid
+  const normalizedImageUrl = normalizeImageUrl(job.imageUrl);
   // Only attempt to show image if URL is valid AND no error occurred
-  const hasValidImage = isValidImageUrl(job.imageUrl) && !imageError;
+  const hasValidImage = normalizedImageUrl !== null && !imageError;
 
   return (
     <Link href={`/ilan/${job.id}`} className="block group">
@@ -61,7 +63,7 @@ export default function JobCard({ job, featured = false }: JobCardProps) {
               )}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={job.imageUrl!}
+                src={normalizedImageUrl!}
                 alt={job.title}
                 className={`absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-500 ${
                   imageLoaded ? "opacity-100" : "opacity-0"

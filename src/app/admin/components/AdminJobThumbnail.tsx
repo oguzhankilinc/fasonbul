@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { getSectorIcon } from "@/lib/constants";
-import { isValidImageUrl } from "@/lib/image-utils";
+import { normalizeImageUrl } from "@/lib/image-utils";
 
 interface AdminJobThumbnailProps {
   imageUrl: string | null | undefined;
@@ -22,8 +22,11 @@ export default function AdminJobThumbnail({ imageUrl, title, sector }: AdminJobT
   const [hasError, setHasError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // Normalize legacy paths to API paths
+  const normalizedUrl = normalizeImageUrl(imageUrl);
+
   // Show fallback if URL is invalid
-  if (!isValidImageUrl(imageUrl)) {
+  if (!normalizedUrl) {
     return <FallbackThumbnail sector={sector} />;
   }
 
@@ -42,7 +45,7 @@ export default function AdminJobThumbnail({ imageUrl, title, sector }: AdminJobT
       )}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={imageUrl}
+        src={normalizedUrl}
         alt={title}
         className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-200 ${
           isLoaded ? "opacity-100" : "opacity-0"

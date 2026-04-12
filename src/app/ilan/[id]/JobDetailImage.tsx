@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { getSectorIcon } from "@/lib/constants";
-import { isValidImageUrl } from "@/lib/image-utils";
+import { normalizeImageUrl } from "@/lib/image-utils";
 
 interface JobDetailImageProps {
   imageUrl: string | null;
@@ -28,8 +28,11 @@ export default function JobDetailImage({ imageUrl, title, sector, sectorLabel }:
   const [hasError, setHasError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // Normalize legacy paths to API paths
+  const normalizedUrl = normalizeImageUrl(imageUrl);
+
   // Show fallback if URL is invalid
-  if (!isValidImageUrl(imageUrl)) {
+  if (!normalizedUrl) {
     return <FallbackImage sector={sector} sectorLabel={sectorLabel} />;
   }
 
@@ -52,7 +55,7 @@ export default function JobDetailImage({ imageUrl, title, sector, sectorLabel }:
       )}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={imageUrl}
+        src={normalizedUrl}
         alt={title}
         className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
           isLoaded ? "opacity-100" : "opacity-0"

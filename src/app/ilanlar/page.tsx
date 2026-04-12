@@ -56,6 +56,7 @@ interface Job {
   imageUrl: string | null;
   createdAt: Date;
   expiresAt: Date | null;
+  isFeatured: boolean;
 }
 
 // Popular cities for internal linking
@@ -103,6 +104,7 @@ async function getJobs(
         imageUrl: true,
         createdAt: true,
         expiresAt: true,
+        isFeatured: true,
       },
     }),
     prisma.jobRequest.count({ where }),

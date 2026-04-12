@@ -93,6 +93,7 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
         imageUrl: true,
         createdAt: true,
         expiresAt: true,
+        isFeatured: true,
       },
     }),
     prisma.jobRequest.count({

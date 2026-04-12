@@ -61,12 +61,16 @@ interface FeaturedJob {
 }
 
 async function getFeaturedJobs(): Promise<FeaturedJob[]> {
-  const featuredJobs = await prisma.jobRequest.findMany({
+  // Single deterministic query: featured jobs first, then recent active jobs
+  // This ensures consistent ordering on every page load
+  const jobs = await prisma.jobRequest.findMany({
     where: {
       status: JOB_STATUS.ACTIVE,
-      isFeatured: true,
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: [
+      { isFeatured: "desc" },  // Featured first
+      { createdAt: "desc" },   // Then by creation date
+    ],
     take: MAX_FEATURED_TOTAL,
     select: {
       id: true,
@@ -82,42 +86,7 @@ async function getFeaturedJobs(): Promise<FeaturedJob[]> {
     },
   });
 
-  if (featuredJobs.length >= MAX_FEATURED_TOTAL) {
-    return featuredJobs;
-  }
-
-  const existingIds = featuredJobs.map(j => j.id);
-  const remainingSlots = MAX_FEATURED_TOTAL - featuredJobs.length;
-  const additionalJobs: FeaturedJob[] = [];
-  const slotsPerSector = Math.ceil(remainingSlots / SECTORS.length);
-
-  for (const sector of SECTORS) {
-    const sectorJobs = await prisma.jobRequest.findMany({
-      where: {
-        status: JOB_STATUS.ACTIVE,
-        sector: sector.value,
-        id: { notIn: existingIds },
-      },
-      orderBy: { createdAt: "desc" },
-      take: slotsPerSector,
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        sector: true,
-        city: true,
-        urgency: true,
-        imageUrl: true,
-        createdAt: true,
-        expiresAt: true,
-        isFeatured: true,
-      },
-    });
-    additionalJobs.push(...sectorJobs);
-    existingIds.push(...sectorJobs.map(j => j.id));
-  }
-
-  return [...featuredJobs, ...additionalJobs].slice(0, MAX_FEATURED_TOTAL);
+  return jobs;
 }
 
 async function getStats() {

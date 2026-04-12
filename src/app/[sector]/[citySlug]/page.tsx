@@ -104,7 +104,10 @@ export default async function CombinedPage({ params }: CombinedPageProps) {
       sector: sectorData.value,
       city: cityData.value,
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: [
+      { isFeatured: "desc" },
+      { createdAt: "desc" },
+    ],
     select: {
       id: true,
       title: true,
@@ -115,6 +118,7 @@ export default async function CombinedPage({ params }: CombinedPageProps) {
       imageUrl: true,
       createdAt: true,
       expiresAt: true,
+      isFeatured: true,
     },
   });
 

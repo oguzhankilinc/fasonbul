@@ -93,6 +93,7 @@ export default async function SectorPage({ params, searchParams }: SectorPagePro
         imageUrl: true,
         createdAt: true,
         expiresAt: true,
+        isFeatured: true,
       },
     }),
     prisma.jobRequest.count({

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
+import { normalizeImageUrl } from "@/lib/image-utils";
 
 interface ImageUploadProps {
   onImageUploaded: (imageUrl: string) => void;
@@ -28,8 +29,11 @@ export default function ImageUpload({ onImageUploaded, onUploadingChange, curren
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadIdRef = useRef(0);
 
-  // What to display: local preview if available, otherwise existing image
-  const displayUrl = localPreview || currentImage || null;
+  // Normalize currentImage URL (convert legacy paths to API paths)
+  const normalizedCurrentImage = useMemo(() => normalizeImageUrl(currentImage), [currentImage]);
+
+  // What to display: local preview if available, otherwise existing (normalized) image
+  const displayUrl = localPreview || normalizedCurrentImage || null;
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

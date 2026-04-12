@@ -97,8 +97,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Return the public URL
-    const imageUrl = `/uploads/jobs/${filename}`;
+    // Return the API URL for dynamic serving
+    // Using /api/images/ route instead of static /uploads/ path
+    // because Next.js doesn't serve files added to public/ at runtime in production
+    const imageUrl = `/api/images/uploads/jobs/${filename}`;
 
     return NextResponse.json({
       success: true,
