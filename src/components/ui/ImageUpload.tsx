@@ -9,20 +9,27 @@ interface ImageUploadProps {
 }
 
 /**
- * Reliable image upload component for job photos.
- * - Handles race conditions between FileReader and upload failure
- * - Uses native <img> for preview compatibility
- * - Supports both web file picker and mobile camera/gallery
+ * Image upload component for job photos.
+ *
+ * Key behavior:
+ * - Shows LOCAL preview (data URL) immediately when user selects a file
+ * - Keeps showing LOCAL preview even after successful upload
+ * - Only passes SERVER URL to parent for form submission / DB storage
+ * - For existing images (edit mode), shows server URL until new file selected
  */
 export default function ImageUpload({ onImageUploaded, onUploadingChange, currentImage }: ImageUploadProps) {
-  const [preview, setPreview] = useState<string | null>(currentImage || null);
+  // localPreview: data URL from FileReader (for immediate display)
+  // null means no new file selected, show currentImage if available
+  const [localPreview, setLocalPreview] = useState<string | null>(null);
+
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [imageError, setImageError] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Track current upload to handle race conditions
   const uploadIdRef = useRef(0);
+
+  // What to display: local preview if available, otherwise existing image
+  const displayUrl = localPreview || currentImage || null;
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -41,7 +48,6 @@ export default function ImageUpload({ onImageUploaded, onUploadingChange, curren
       return;
     }
 
-    // Increment upload ID to track this specific upload
     const currentUploadId = ++uploadIdRef.current;
 
     setError(null);
@@ -49,12 +55,11 @@ export default function ImageUpload({ onImageUploaded, onUploadingChange, curren
     setUploading(true);
     onUploadingChange?.(true);
 
-    // Show preview immediately using data URL
+    // Show local preview immediately using data URL
     const reader = new FileReader();
     reader.onload = (e) => {
-      // Only set preview if this is still the current upload (not cancelled/failed)
       if (currentUploadId === uploadIdRef.current) {
-        setPreview(e.target?.result as string);
+        setLocalPreview(e.target?.result as string);
       }
     };
     reader.readAsDataURL(file);
@@ -69,9 +74,8 @@ export default function ImageUpload({ onImageUploaded, onUploadingChange, curren
         body: formData,
       });
 
-      // Check if this upload is still current
       if (currentUploadId !== uploadIdRef.current) {
-        return; // A newer upload started, ignore this result
+        return;
       }
 
       const data = await response.json();
@@ -84,21 +88,18 @@ export default function ImageUpload({ onImageUploaded, onUploadingChange, curren
         throw new Error("Sunucu geçerli bir URL döndürmedi");
       }
 
-      // Update preview to the server URL and notify parent
-      setPreview(data.imageUrl);
+      // SUCCESS: Keep showing local preview, but pass server URL to parent
+      // DO NOT replace localPreview with server URL - that causes display issues
       onImageUploaded(data.imageUrl);
     } catch (err) {
-      // Only handle error if this is still the current upload
       if (currentUploadId === uploadIdRef.current) {
         const errorMessage = err instanceof Error ? err.message : "Yükleme başarısız";
         setError(errorMessage);
-        setPreview(null);
+        setLocalPreview(null);
         onImageUploaded("");
-        // Increment upload ID to ignore any pending FileReader results
         uploadIdRef.current++;
       }
     } finally {
-      // Only update state if this is still the current upload
       if (currentUploadId === uploadIdRef.current) {
         setUploading(false);
         onUploadingChange?.(false);
@@ -107,9 +108,8 @@ export default function ImageUpload({ onImageUploaded, onUploadingChange, curren
   };
 
   const handleRemove = () => {
-    // Increment upload ID to cancel any pending operations
     uploadIdRef.current++;
-    setPreview(null);
+    setLocalPreview(null);
     setImageError(false);
     setError(null);
     onImageUploaded("");
@@ -130,16 +130,20 @@ export default function ImageUpload({ onImageUploaded, onUploadingChange, curren
         id="job-image-upload"
       />
 
-      {preview && !imageError ? (
+      {displayUrl && !imageError ? (
         <div className="relative">
           <div className="relative aspect-[3/2] w-full max-w-md rounded-xl overflow-hidden border border-border bg-gray-100">
-            {/* Native img for reliable preview of both data URLs and server URLs */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={preview}
+              src={displayUrl}
               alt="İlan görseli önizleme"
               className="absolute inset-0 w-full h-full object-cover"
-              onError={() => setImageError(true)}
+              onError={() => {
+                // Only set error for server URLs, not data URLs
+                if (!displayUrl.startsWith("data:")) {
+                  setImageError(true);
+                }
+              }}
             />
             {uploading && (
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
@@ -164,7 +168,7 @@ export default function ImageUpload({ onImageUploaded, onUploadingChange, curren
             </svg>
           </button>
         </div>
-      ) : preview && imageError ? (
+      ) : displayUrl && imageError ? (
         <div className="relative">
           <div className="relative aspect-[3/2] w-full max-w-md rounded-xl overflow-hidden border-2 border-dashed border-amber-300 bg-amber-50 flex items-center justify-center">
             <div className="text-center p-4">
