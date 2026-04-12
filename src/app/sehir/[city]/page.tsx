@@ -90,6 +90,7 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
         sector: true,
         city: true,
         urgency: true,
+        imageUrl: true,
         createdAt: true,
         expiresAt: true,
       },

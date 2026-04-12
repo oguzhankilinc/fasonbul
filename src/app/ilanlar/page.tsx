@@ -53,6 +53,7 @@ interface Job {
   sector: string;
   city: string;
   urgency: string | null;
+  imageUrl: string | null;
   createdAt: Date;
   expiresAt: Date | null;
 }
@@ -99,6 +100,7 @@ async function getJobs(
         sector: true,
         city: true,
         urgency: true,
+        imageUrl: true,
         createdAt: true,
         expiresAt: true,
       },

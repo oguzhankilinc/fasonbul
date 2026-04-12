@@ -34,6 +34,7 @@ model JobRequest {
   phone       String
   whatsapp    String
   urgency     String?
+  imageUrl    String?   // Single job photo URL
   status      String    @default("PENDING_APPROVAL") // DRAFT, PENDING_APPROVAL, ACTIVE, PASSIVE, EXPIRED, REJECTED
   isFeatured  Boolean   @default(false) // Admin can mark listings for homepage showcase
   approvedAt  DateTime?

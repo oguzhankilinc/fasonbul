@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
@@ -7,6 +8,7 @@ import {
   getSectorLabel,
   getCityLabel,
   getUrgencyLabel,
+  getSectorIcon,
   JOB_STATUS,
 } from "@/lib/constants";
 import {
@@ -177,75 +179,101 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Content */}
         <div className="lg:col-span-2">
-          <article className="card">
-            {/* Header */}
-            <div className="mb-6">
-              <div className="flex flex-wrap items-center gap-2 mb-3">
-                <span className="badge-primary">{getSectorLabel(job.sector)}</span>
-                <span className="badge-secondary">{getCityLabel(job.city)}</span>
-                {job.urgency && job.urgency !== "normal" && (
-                  <span
-                    className={
-                      job.urgency === "cok-acil" ? "badge-error" : "badge-warning"
-                    }
-                  >
-                    {getUrgencyLabel(job.urgency)}
-                  </span>
-                )}
-                {job.status !== JOB_STATUS.ACTIVE && (
-                  <span className="badge-secondary">
-                    {job.status === JOB_STATUS.PENDING_APPROVAL && "Onay Bekliyor"}
-                    {job.status === JOB_STATUS.PASSIVE && "Pasif"}
-                    {job.status === JOB_STATUS.EXPIRED && "Süresi Doldu"}
-                    {job.status === JOB_STATUS.REJECTED && "Reddedildi"}
-                  </span>
-                )}
+          <article className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+            {/* Job Image */}
+            {job.imageUrl ? (
+              <div className="relative aspect-[16/9] w-full bg-gray-100">
+                <Image
+                  src={job.imageUrl}
+                  alt={job.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 66vw"
+                  priority
+                />
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-                {job.title}
-              </h1>
-            </div>
-
-            {/* Description */}
-            <div className="prose max-w-none">
-              <h2 className="text-lg font-semibold text-foreground mb-3">
-                İlan Detayı
-              </h2>
-              <p className="text-secondary whitespace-pre-wrap">{job.description}</p>
-            </div>
-
-            {/* Meta Info */}
-            <div className="mt-8 pt-6 border-t border-border">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div>
-                  <span className="text-secondary">Yayın Tarihi</span>
-                  <p className="font-medium text-foreground">
-                    {formatDate(job.createdAt)}
-                  </p>
+            ) : (
+              <div className="relative aspect-[16/9] w-full bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                  <span className="text-7xl opacity-40" role="img" aria-label={sectorLabel}>
+                    {getSectorIcon(job.sector)}
+                  </span>
+                  <p className="text-sm text-secondary mt-2 opacity-60">Görsel yok</p>
                 </div>
-                {job.expiresAt && job.status === JOB_STATUS.ACTIVE && (
-                  <div>
-                    <span className="text-secondary">Kalan Süre</span>
-                    <p
-                      className={`font-medium ${
-                        remainingDays <= 5 ? "text-error" : "text-foreground"
-                      }`}
+              </div>
+            )}
+
+            {/* Content */}
+            <div className="p-6 md:p-8">
+              {/* Header */}
+              <div className="mb-6">
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  <span className="badge-primary">{getSectorLabel(job.sector)}</span>
+                  <span className="badge-secondary">{getCityLabel(job.city)}</span>
+                  {job.urgency && job.urgency !== "normal" && (
+                    <span
+                      className={
+                        job.urgency === "cok-acil" ? "badge-error" : "badge-warning"
+                      }
                     >
-                      {remainingDays} gün
+                      {getUrgencyLabel(job.urgency)}
+                    </span>
+                  )}
+                  {job.status !== JOB_STATUS.ACTIVE && (
+                    <span className="badge-secondary">
+                      {job.status === JOB_STATUS.PENDING_APPROVAL && "Onay Bekliyor"}
+                      {job.status === JOB_STATUS.PASSIVE && "Pasif"}
+                      {job.status === JOB_STATUS.EXPIRED && "Süresi Doldu"}
+                      {job.status === JOB_STATUS.REJECTED && "Reddedildi"}
+                    </span>
+                  )}
+                </div>
+                <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+                  {job.title}
+                </h1>
+              </div>
+
+              {/* Description */}
+              <div className="prose max-w-none">
+                <h2 className="text-lg font-semibold text-foreground mb-3">
+                  İlan Detayı
+                </h2>
+                <p className="text-secondary whitespace-pre-wrap">{job.description}</p>
+              </div>
+
+              {/* Meta Info */}
+              <div className="mt-8 pt-6 border-t border-border">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <span className="text-secondary">Yayın Tarihi</span>
+                    <p className="font-medium text-foreground">
+                      {formatDate(job.createdAt)}
                     </p>
                   </div>
-                )}
-                <div>
-                  <span className="text-secondary">Sektör</span>
-                  <p className="font-medium text-foreground">
-                    {getSectorLabel(job.sector)}
-                  </p>
-                </div>
-                <div>
-                  <span className="text-secondary">Şehir</span>
-                  <p className="font-medium text-foreground">
-                    {getCityLabel(job.city)}
-                  </p>
+                  {job.expiresAt && job.status === JOB_STATUS.ACTIVE && (
+                    <div>
+                      <span className="text-secondary">Kalan Süre</span>
+                      <p
+                        className={`font-medium ${
+                          remainingDays <= 5 ? "text-error" : "text-foreground"
+                        }`}
+                      >
+                        {remainingDays} gün
+                      </p>
+                    </div>
+                  )}
+                  <div>
+                    <span className="text-secondary">Sektör</span>
+                    <p className="font-medium text-foreground">
+                      {getSectorLabel(job.sector)}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-secondary">Şehir</span>
+                    <p className="font-medium text-foreground">
+                      {getCityLabel(job.city)}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>

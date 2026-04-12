@@ -2,7 +2,7 @@ import Image from "next/image";
 
 interface LogoProps {
   className?: string;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
 }
 
 export default function Logo({ className = "", size = "md" }: LogoProps) {
@@ -10,6 +10,7 @@ export default function Logo({ className = "", size = "md" }: LogoProps) {
     sm: { width: 120, height: 40 },
     md: { width: 150, height: 50 },
     lg: { width: 180, height: 60 },
+    xl: { width: 200, height: 66 },
   };
 
   const { width, height } = sizes[size];

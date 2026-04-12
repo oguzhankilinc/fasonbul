@@ -112,6 +112,7 @@ export default async function CombinedPage({ params }: CombinedPageProps) {
       sector: true,
       city: true,
       urgency: true,
+      imageUrl: true,
       createdAt: true,
       expiresAt: true,
     },

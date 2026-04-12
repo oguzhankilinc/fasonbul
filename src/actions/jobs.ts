@@ -32,6 +32,7 @@ export async function createJob(
   const phone = formData.get("phone") as string;
   const whatsapp = formData.get("whatsapp") as string;
   const urgency = formData.get("urgency") as string;
+  const imageUrl = formData.get("imageUrl") as string;
 
   // Validation
   if (!sector || !city || !title || !description || !phone || !whatsapp) {
@@ -56,6 +57,7 @@ export async function createJob(
       phone,
       whatsapp,
       urgency: urgency || null,
+      imageUrl: imageUrl || null,
       status: JOB_STATUS.PENDING_APPROVAL,
     },
   });

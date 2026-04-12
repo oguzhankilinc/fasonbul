@@ -1,13 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { useActionState } from "react";
 import { createJob, JobState } from "@/actions/jobs";
 import { SECTORS, CITIES, URGENCY_OPTIONS } from "@/lib/constants";
+import ImageUpload from "@/components/ui/ImageUpload";
 
 const initialState: JobState = {};
 
 export default function CreateJobPage() {
   const [state, formAction, pending] = useActionState(createJob, initialState);
+  const [imageUrl, setImageUrl] = useState<string>("");
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -85,10 +88,23 @@ export default function CreateJobPage() {
             </div>
           </div>
 
-          {/* Section: Job Details */}
+          {/* Section: Job Photo */}
           <div className="pt-4 border-t border-border">
             <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
               <span className="w-6 h-6 bg-primary-light text-primary rounded-full flex items-center justify-center text-xs font-bold">2</span>
+              İlan Fotoğrafı
+            </h3>
+            <input type="hidden" name="imageUrl" value={imageUrl} />
+            <ImageUpload
+              onImageUploaded={(url) => setImageUrl(url)}
+              currentImage={imageUrl || null}
+            />
+          </div>
+
+          {/* Section: Job Details */}
+          <div className="pt-4 border-t border-border">
+            <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+              <span className="w-6 h-6 bg-primary-light text-primary rounded-full flex items-center justify-center text-xs font-bold">3</span>
               İlan Detayları
             </h3>
 
@@ -144,7 +160,7 @@ export default function CreateJobPage() {
           {/* Section: Contact Info */}
           <div className="pt-4 border-t border-border">
             <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
-              <span className="w-6 h-6 bg-primary-light text-primary rounded-full flex items-center justify-center text-xs font-bold">3</span>
+              <span className="w-6 h-6 bg-primary-light text-primary rounded-full flex items-center justify-center text-xs font-bold">4</span>
               İletişim Bilgileri
             </h3>
 

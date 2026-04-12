@@ -90,6 +90,7 @@ export default async function SectorPage({ params, searchParams }: SectorPagePro
         sector: true,
         city: true,
         urgency: true,
+        imageUrl: true,
         createdAt: true,
         expiresAt: true,
       },

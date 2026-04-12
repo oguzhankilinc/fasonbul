@@ -54,6 +54,7 @@ interface FeaturedJob {
   sector: string;
   city: string;
   urgency: string | null;
+  imageUrl: string | null;
   createdAt: Date;
   expiresAt: Date | null;
   isFeatured: boolean;
@@ -74,6 +75,7 @@ async function getFeaturedJobs(): Promise<FeaturedJob[]> {
       sector: true,
       city: true,
       urgency: true,
+      imageUrl: true,
       createdAt: true,
       expiresAt: true,
       isFeatured: true,
@@ -105,6 +107,7 @@ async function getFeaturedJobs(): Promise<FeaturedJob[]> {
         sector: true,
         city: true,
         urgency: true,
+        imageUrl: true,
         createdAt: true,
         expiresAt: true,
         isFeatured: true,
