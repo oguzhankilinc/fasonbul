@@ -2,9 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
-import { getSectorLabel, getCityLabel, getSectorIcon } from "@/lib/constants";
+import { getSectorLabel, getCityLabel } from "@/lib/constants";
 import { formatRelativeDate, truncateText, getRemainingDays } from "@/lib/utils";
+import AdminJobThumbnail from "./AdminJobThumbnail";
 import {
   approveJob,
   rejectJob,
@@ -105,32 +105,23 @@ export default function AdminJobList({
         const remainingDays = job.expiresAt ? getRemainingDays(job.expiresAt) : null;
 
         return (
-          <div key={job.id} className={`card ${job.isFeatured ? 'border-primary/30 bg-gradient-to-br from-white to-primary-light/20' : ''}`}>
+          <div
+            key={job.id}
+            className={`p-4 rounded-xl border ${
+              job.isFeatured
+                ? "border-primary/40 bg-primary/10"
+                : "border-gray-600 bg-gray-700/50"
+            }`}
+          >
             <div className="flex flex-col md:flex-row gap-4">
               {/* Image Thumbnail */}
               <div className="flex-shrink-0">
-                <div className="relative w-full md:w-32 h-24 rounded-lg overflow-hidden bg-gray-100">
-                  {job.imageUrl ? (
-                    <Image
-                      src={job.imageUrl}
-                      alt={job.title}
-                      fill
-                      className="object-cover"
-                      unoptimized
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        const parent = target.parentElement;
-                        if (parent) {
-                          parent.innerHTML = `<div class="w-full h-full flex items-center justify-center bg-gray-100"><span class="text-3xl opacity-50">${getSectorIcon(job.sector)}</span></div>`;
-                        }
-                      }}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-3xl opacity-50">{getSectorIcon(job.sector)}</span>
-                    </div>
-                  )}
+                <div className="relative w-full md:w-32 h-24 rounded-lg overflow-hidden bg-gray-600">
+                  <AdminJobThumbnail
+                    imageUrl={job.imageUrl}
+                    title={job.title}
+                    sector={job.sector}
+                  />
                 </div>
               </div>
 
@@ -138,33 +129,43 @@ export default function AdminJobList({
               <div className="flex-1 min-w-0">
                 {/* Header */}
                 <div className="flex flex-wrap items-center gap-2 mb-2">
-                  <span className="badge-primary text-xs">{getSectorLabel(job.sector)}</span>
-                  <span className="badge-secondary text-xs">{getCityLabel(job.city)}</span>
+                  <span className="px-2 py-0.5 text-xs font-medium rounded bg-primary/20 text-primary">
+                    {getSectorLabel(job.sector)}
+                  </span>
+                  <span className="px-2 py-0.5 text-xs font-medium rounded bg-gray-600 text-gray-300">
+                    {getCityLabel(job.city)}
+                  </span>
                   {job.isFeatured && (
-                    <span className="badge-warning text-xs">Vitrin</span>
+                    <span className="px-2 py-0.5 text-xs font-medium rounded bg-amber-500/20 text-amber-400">
+                      Vitrin
+                    </span>
                   )}
                   {remainingDays !== null && remainingDays <= 7 && remainingDays > 0 && (
-                    <span className="badge-error text-xs">{remainingDays} gün kaldı</span>
+                    <span className="px-2 py-0.5 text-xs font-medium rounded bg-red-500/20 text-red-400">
+                      {remainingDays} gün kaldı
+                    </span>
                   )}
                   {remainingDays !== null && remainingDays <= 0 && (
-                    <span className="badge-error text-xs">Süresi doldu</span>
+                    <span className="px-2 py-0.5 text-xs font-medium rounded bg-red-500/20 text-red-400">
+                      Süresi doldu
+                    </span>
                   )}
                 </div>
 
                 <Link
                   href={`/ilan/${job.id}`}
-                  className="text-base font-semibold text-foreground hover:text-primary block truncate"
+                  className="text-base font-semibold text-white hover:text-primary block truncate"
                   target="_blank"
                 >
                   {job.title}
                 </Link>
 
-                <p className="text-sm text-secondary mt-1 line-clamp-2">
+                <p className="text-sm text-gray-400 mt-1 line-clamp-2">
                   {truncateText(job.description, 150)}
                 </p>
 
-                {/* Owner Info - Compact */}
-                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-secondary mt-2">
+                {/* Owner Info */}
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500 mt-2">
                   <span>{job.owner.companyName || job.owner.name}</span>
                   <span>{job.phone}</span>
                   <span>{formatRelativeDate(job.createdAt)}</span>
@@ -176,13 +177,13 @@ export default function AdminJobList({
                     <>
                       <button
                         onClick={() => handleApprove(job.id)}
-                        className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-green-500 hover:bg-green-600 text-white transition-colors"
+                        className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-green-600 hover:bg-green-500 text-white transition-colors"
                       >
                         Onayla
                       </button>
                       <button
                         onClick={() => handleReject(job.id)}
-                        className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-500 hover:bg-red-600 text-white transition-colors"
+                        className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-600 hover:bg-red-500 text-white transition-colors"
                       >
                         Reddet
                       </button>
@@ -194,8 +195,8 @@ export default function AdminJobList({
                       onClick={() => handleToggleFeatured(job.id)}
                       className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
                         job.isFeatured
-                          ? "bg-amber-100 text-amber-700 hover:bg-amber-200"
-                          : "bg-primary-light text-primary hover:bg-primary/20"
+                          ? "bg-amber-600 hover:bg-amber-500 text-white"
+                          : "bg-amber-600/20 hover:bg-amber-600/30 text-amber-400"
                       }`}
                     >
                       {job.isFeatured ? "Vitrinden Çıkar" : "Vitrine Ekle"}
@@ -205,7 +206,7 @@ export default function AdminJobList({
                   {showSetPassive && (
                     <button
                       onClick={() => handleSetPassive(job.id)}
-                      className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
+                      className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-gray-600 hover:bg-gray-500 text-white transition-colors"
                     >
                       Pasife Al
                     </button>
@@ -214,7 +215,7 @@ export default function AdminJobList({
                   {showSetActive && (
                     <button
                       onClick={() => handleSetActive(job.id)}
-                      className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-green-100 hover:bg-green-200 text-green-700 transition-colors"
+                      className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-green-600/20 hover:bg-green-600/30 text-green-400 transition-colors"
                     >
                       Aktif Et
                     </button>
@@ -223,7 +224,7 @@ export default function AdminJobList({
                   {showExtendDuration && (
                     <button
                       onClick={() => handleExtendDuration(job.id)}
-                      className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-700 transition-colors"
+                      className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 transition-colors"
                     >
                       +30 Gün Uzat
                     </button>
@@ -232,14 +233,14 @@ export default function AdminJobList({
                   <Link
                     href={`/ilan/${job.id}`}
                     target="_blank"
-                    className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
+                    className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-gray-600 hover:bg-gray-500 text-gray-300 transition-colors"
                   >
                     Görüntüle
                   </Link>
 
                   <button
                     onClick={() => handleDelete(job.id)}
-                    className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-colors"
+                    className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-600/20 hover:bg-red-600/30 text-red-400 transition-colors"
                   >
                     Sil
                   </button>

@@ -23,13 +23,13 @@ export default async function PassiveJobsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-foreground mb-6">
+      <h1 className="text-2xl font-bold text-white mb-6">
         Pasif İlanlar ({jobs.length})
       </h1>
 
       {jobs.length === 0 ? (
-        <div className="card text-center py-12">
-          <p className="text-secondary">Pasif ilan bulunmuyor.</p>
+        <div className="text-center py-12">
+          <p className="text-gray-400">Pasif ilan bulunmuyor.</p>
         </div>
       ) : (
         <AdminJobList jobs={jobs} showSetActive />

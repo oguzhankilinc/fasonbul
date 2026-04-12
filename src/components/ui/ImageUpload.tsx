@@ -1,13 +1,16 @@
 "use client";
 
 import { useState, useRef } from "react";
-import Image from "next/image";
 
 interface ImageUploadProps {
   onImageUploaded: (imageUrl: string) => void;
   currentImage?: string | null;
 }
 
+/**
+ * Reliable image upload component for job photos.
+ * Uses native <img> for preview to ensure compatibility with data URLs and server URLs.
+ */
 export default function ImageUpload({ onImageUploaded, currentImage }: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(currentImage || null);
   const [uploading, setUploading] = useState(false);
@@ -36,14 +39,14 @@ export default function ImageUpload({ onImageUploaded, currentImage }: ImageUplo
     setImageError(false);
     setUploading(true);
 
-    // Show preview immediately
+    // Show preview immediately using data URL
     const reader = new FileReader();
     reader.onload = (e) => {
       setPreview(e.target?.result as string);
     };
     reader.readAsDataURL(file);
 
-    // Upload file
+    // Upload file to server
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -59,12 +62,13 @@ export default function ImageUpload({ onImageUploaded, currentImage }: ImageUplo
         throw new Error(data.error || "Yükleme başarısız");
       }
 
-      // Update preview to use the actual URL after successful upload
+      // Update preview to the server URL and notify parent
       setPreview(data.imageUrl);
       onImageUploaded(data.imageUrl);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Yükleme başarısız");
       setPreview(null);
+      onImageUploaded("");
     } finally {
       setUploading(false);
     }
@@ -73,18 +77,12 @@ export default function ImageUpload({ onImageUploaded, currentImage }: ImageUplo
   const handleRemove = () => {
     setPreview(null);
     setImageError(false);
+    setError(null);
     onImageUploaded("");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
-
-  const handleImageError = () => {
-    setImageError(true);
-  };
-
-  // Check if preview is a data URL (base64) or a file path
-  const isDataUrl = preview?.startsWith("data:");
 
   return (
     <div className="space-y-3">
@@ -100,14 +98,14 @@ export default function ImageUpload({ onImageUploaded, currentImage }: ImageUplo
 
       {preview && !imageError ? (
         <div className="relative">
-          <div className="relative aspect-[3/2] w-full max-w-md rounded-xl overflow-hidden border border-border bg-gray-50">
-            <Image
+          <div className="relative aspect-[3/2] w-full max-w-md rounded-xl overflow-hidden border border-border bg-gray-100">
+            {/* Native img for reliable preview of both data URLs and server URLs */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={preview}
               alt="İlan görseli önizleme"
-              fill
-              className="object-cover"
-              unoptimized={isDataUrl}
-              onError={handleImageError}
+              className="absolute inset-0 w-full h-full object-cover"
+              onError={() => setImageError(true)}
             />
             {uploading && (
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
@@ -133,7 +131,6 @@ export default function ImageUpload({ onImageUploaded, currentImage }: ImageUplo
           </button>
         </div>
       ) : preview && imageError ? (
-        // Broken image fallback - allow re-upload
         <div className="relative">
           <div className="relative aspect-[3/2] w-full max-w-md rounded-xl overflow-hidden border-2 border-dashed border-amber-300 bg-amber-50 flex items-center justify-center">
             <div className="text-center p-4">
@@ -141,7 +138,7 @@ export default function ImageUpload({ onImageUploaded, currentImage }: ImageUplo
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
               <p className="text-sm font-medium text-amber-700">Görsel yüklenemedi</p>
-              <p className="text-xs text-amber-600 mt-1">Dosya mevcut değil veya bozuk</p>
+              <p className="text-xs text-amber-600 mt-1">Lütfen tekrar deneyin</p>
             </div>
           </div>
           <button

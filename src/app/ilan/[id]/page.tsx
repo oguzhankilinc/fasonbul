@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
@@ -8,7 +7,6 @@ import {
   getSectorLabel,
   getCityLabel,
   getUrgencyLabel,
-  getSectorIcon,
   JOB_STATUS,
 } from "@/lib/constants";
 import {
@@ -18,6 +16,7 @@ import {
   generateWhatsAppLink,
 } from "@/lib/utils";
 import ContactButtons from "./ContactButtons";
+import JobDetailImage from "./JobDetailImage";
 
 interface JobDetailPageProps {
   params: Promise<{ id: string }>;
@@ -181,27 +180,12 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
         <div className="lg:col-span-2">
           <article className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
             {/* Job Image */}
-            {job.imageUrl ? (
-              <div className="relative aspect-[16/9] w-full bg-gray-100">
-                <Image
-                  src={job.imageUrl}
-                  alt={job.title}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 66vw"
-                  priority
-                />
-              </div>
-            ) : (
-              <div className="relative aspect-[16/9] w-full bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 flex items-center justify-center">
-                <div className="text-center">
-                  <span className="text-7xl opacity-40" role="img" aria-label={sectorLabel}>
-                    {getSectorIcon(job.sector)}
-                  </span>
-                  <p className="text-sm text-secondary mt-2 opacity-60">Görsel yok</p>
-                </div>
-              </div>
-            )}
+            <JobDetailImage
+              imageUrl={job.imageUrl}
+              title={job.title}
+              sector={job.sector}
+              sectorLabel={sectorLabel}
+            />
 
             {/* Content */}
             <div className="p-6 md:p-8">
