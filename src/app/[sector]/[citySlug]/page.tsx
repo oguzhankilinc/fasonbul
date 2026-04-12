@@ -6,25 +6,24 @@ import {
   SECTORS,
   CITIES,
   JOB_STATUS,
-  getSectorLabel,
-  getCityLabel,
 } from "@/lib/constants";
 import JobFilters from "@/components/jobs/JobFilters";
 import JobList from "@/components/jobs/JobList";
 import { Suspense } from "react";
 
 interface CombinedPageProps {
-  params: Promise<{ sector: string; "city": string }>;
+  params: Promise<{ sector: string; citySlug: string }>;
 }
 
-function extractCity(slug: string): string | null {
+function extractCity(slug: string | undefined): string | null {
+  if (!slug) return null;
   // slug format: "istanbul-fason-is-ilanlari" -> "istanbul"
   const match = slug.match(/^(.+)-fason-is-ilanlari$/);
   return match ? match[1] : null;
 }
 
 export async function generateStaticParams() {
-  const params: { sector: string; "city": string }[] = [];
+  const params: { sector: string; citySlug: string }[] = [];
 
   // Generate only for popular combinations to avoid too many pages
   const popularSectors = SECTORS.slice(0, 6);
@@ -38,7 +37,7 @@ export async function generateStaticParams() {
     for (const city of popularCities) {
       params.push({
         sector: sector.value,
-        "city": `${city.value}-fason-is-ilanlari`,
+        citySlug: `${city.value}-fason-is-ilanlari`,
       });
     }
   }
@@ -51,8 +50,8 @@ export async function generateMetadata({
 }: CombinedPageProps): Promise<Metadata> {
   const resolvedParams = await params;
   const sectorData = SECTORS.find((s) => s.value === resolvedParams.sector);
-  const citySlug = extractCity(resolvedParams["city"]);
-  const cityData = citySlug ? CITIES.find((c) => c.value === citySlug) : null;
+  const cityValue = extractCity(resolvedParams.citySlug);
+  const cityData = cityValue ? CITIES.find((c) => c.value === cityValue) : null;
 
   if (!sectorData || !cityData) {
     return { title: "Sayfa Bulunamadı" };
@@ -92,8 +91,8 @@ export async function generateMetadata({
 export default async function CombinedPage({ params }: CombinedPageProps) {
   const resolvedParams = await params;
   const sectorData = SECTORS.find((s) => s.value === resolvedParams.sector);
-  const citySlug = extractCity(resolvedParams["city"]);
-  const cityData = citySlug ? CITIES.find((c) => c.value === citySlug) : null;
+  const cityValue = extractCity(resolvedParams.citySlug);
+  const cityData = cityValue ? CITIES.find((c) => c.value === cityValue) : null;
 
   if (!sectorData || !cityData) {
     notFound();
@@ -200,21 +199,21 @@ export default async function CombinedPage({ params }: CombinedPageProps) {
           </p>
         </div>
 
-      {/* Filters */}
-      <Suspense fallback={<div className="h-24 bg-muted rounded-xl animate-pulse" />}>
-        <JobFilters />
-      </Suspense>
+        {/* Filters */}
+        <Suspense fallback={<div className="h-24 bg-muted rounded-xl animate-pulse" />}>
+          <JobFilters />
+        </Suspense>
 
-      {/* Job Count */}
-      <div className="mb-4">
-        <p className="text-sm text-secondary">
-          <span className="font-semibold text-foreground">{jobs.length}</span>{" "}
-          {sectorData.label.toLowerCase()} ilanı {cityData.label} ilinde bulundu
-        </p>
-      </div>
+        {/* Job Count */}
+        <div className="mb-4">
+          <p className="text-sm text-secondary">
+            <span className="font-semibold text-foreground">{jobs.length}</span>{" "}
+            {sectorData.label.toLowerCase()} ilanı {cityData.label} ilinde bulundu
+          </p>
+        </div>
 
-      {/* Job Listings */}
-      <JobList jobs={jobs} />
+        {/* Job Listings */}
+        <JobList jobs={jobs} />
 
         {/* SEO Content */}
         <section className="mt-12 pt-8 border-t border-border">
