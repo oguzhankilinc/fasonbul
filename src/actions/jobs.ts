@@ -83,6 +83,7 @@ export async function updateJob(
   const phone = formData.get("phone") as string;
   const whatsapp = formData.get("whatsapp") as string;
   const urgency = formData.get("urgency") as string;
+  const imageUrl = formData.get("imageUrl") as string;
 
   if (!jobId) {
     return { error: "Geçersiz ilan." };
@@ -130,6 +131,7 @@ export async function updateJob(
       phone,
       whatsapp,
       urgency: urgency || null,
+      imageUrl: imageUrl || null,
       status: newStatus,
       approvedAt: newStatus === JOB_STATUS.PENDING_APPROVAL ? null : job.approvedAt,
       expiresAt: newStatus === JOB_STATUS.PENDING_APPROVAL ? null : job.expiresAt,
