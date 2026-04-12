@@ -10,7 +10,9 @@ interface ImageUploadProps {
 
 /**
  * Reliable image upload component for job photos.
- * Uses native <img> for preview to ensure compatibility with data URLs and server URLs.
+ * - Handles race conditions between FileReader and upload failure
+ * - Uses native <img> for preview compatibility
+ * - Supports both web file picker and mobile camera/gallery
  */
 export default function ImageUpload({ onImageUploaded, onUploadingChange, currentImage }: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(currentImage || null);
@@ -18,6 +20,9 @@ export default function ImageUpload({ onImageUploaded, onUploadingChange, curren
   const [error, setError] = useState<string | null>(null);
   const [imageError, setImageError] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Track current upload to handle race conditions
+  const uploadIdRef = useRef(0);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -36,6 +41,9 @@ export default function ImageUpload({ onImageUploaded, onUploadingChange, curren
       return;
     }
 
+    // Increment upload ID to track this specific upload
+    const currentUploadId = ++uploadIdRef.current;
+
     setError(null);
     setImageError(false);
     setUploading(true);
@@ -44,7 +52,10 @@ export default function ImageUpload({ onImageUploaded, onUploadingChange, curren
     // Show preview immediately using data URL
     const reader = new FileReader();
     reader.onload = (e) => {
-      setPreview(e.target?.result as string);
+      // Only set preview if this is still the current upload (not cancelled/failed)
+      if (currentUploadId === uploadIdRef.current) {
+        setPreview(e.target?.result as string);
+      }
     };
     reader.readAsDataURL(file);
 
@@ -58,26 +69,46 @@ export default function ImageUpload({ onImageUploaded, onUploadingChange, curren
         body: formData,
       });
 
+      // Check if this upload is still current
+      if (currentUploadId !== uploadIdRef.current) {
+        return; // A newer upload started, ignore this result
+      }
+
       const data = await response.json();
 
       if (!response.ok) {
         throw new Error(data.error || "Yükleme başarısız");
       }
 
+      if (!data.imageUrl) {
+        throw new Error("Sunucu geçerli bir URL döndürmedi");
+      }
+
       // Update preview to the server URL and notify parent
       setPreview(data.imageUrl);
       onImageUploaded(data.imageUrl);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Yükleme başarısız");
-      setPreview(null);
-      onImageUploaded("");
+      // Only handle error if this is still the current upload
+      if (currentUploadId === uploadIdRef.current) {
+        const errorMessage = err instanceof Error ? err.message : "Yükleme başarısız";
+        setError(errorMessage);
+        setPreview(null);
+        onImageUploaded("");
+        // Increment upload ID to ignore any pending FileReader results
+        uploadIdRef.current++;
+      }
     } finally {
-      setUploading(false);
-      onUploadingChange?.(false);
+      // Only update state if this is still the current upload
+      if (currentUploadId === uploadIdRef.current) {
+        setUploading(false);
+        onUploadingChange?.(false);
+      }
     }
   };
 
   const handleRemove = () => {
+    // Increment upload ID to cancel any pending operations
+    uploadIdRef.current++;
     setPreview(null);
     setImageError(false);
     setError(null);

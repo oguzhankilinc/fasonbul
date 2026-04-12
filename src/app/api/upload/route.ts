@@ -15,6 +15,7 @@ export async function POST(request: NextRequest) {
   try {
     // Check authentication
     const user = await getCurrentUser();
+
     if (!user) {
       return NextResponse.json(
         { error: "Giriş yapmanız gerekiyor." },
@@ -79,6 +80,7 @@ export async function POST(request: NextRequest) {
 
     // Ensure upload directory exists
     const uploadDir = path.join(process.cwd(), "public", "uploads", "jobs");
+
     if (!existsSync(uploadDir)) {
       await mkdir(uploadDir, { recursive: true });
     }
@@ -86,6 +88,14 @@ export async function POST(request: NextRequest) {
     // Save file
     const filepath = path.join(uploadDir, filename);
     await writeFile(filepath, optimizedBuffer);
+
+    // Verify file was saved successfully
+    if (!existsSync(filepath)) {
+      return NextResponse.json(
+        { error: "Dosya kaydedilemedi. Lütfen tekrar deneyin." },
+        { status: 500 }
+      );
+    }
 
     // Return the public URL
     const imageUrl = `/uploads/jobs/${filename}`;
