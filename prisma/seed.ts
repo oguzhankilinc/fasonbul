@@ -12,7 +12,21 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   console.log("Seeding database...");
 
-  // Create admin user
+  // Create AdminUser for separate admin authentication
+  const adminUserPassword = await bcrypt.hash("Admin123!", 12);
+  const adminUser = await prisma.adminUser.upsert({
+    where: { email: "admin@fasonbul.com" },
+    update: {},
+    create: {
+      email: "admin@fasonbul.com",
+      name: "Site Admin",
+      role: "ADMIN",
+      passwordHash: adminUserPassword,
+    },
+  });
+  console.log("AdminUser created:", adminUser.email);
+
+  // Create admin user (legacy - for User table)
   const adminPassword = await bcrypt.hash("admin123", 12);
   const admin = await prisma.user.upsert({
     where: { email: "admin@fasonbul.com" },

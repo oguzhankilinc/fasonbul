@@ -65,3 +65,13 @@ model ContactView {
   @@index([jobRequestId])
   @@index([userId])
 }
+
+// Separate admin authentication - independent from User table
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("ADMIN")
+  createdAt    DateTime @default(now())
+}

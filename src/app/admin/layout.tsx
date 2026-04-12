@@ -1,16 +1,18 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentAdmin } from "@/lib/admin-auth";
+import { adminLogout } from "@/actions/admin-auth";
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = await getCurrentUser();
+  const admin = await getCurrentAdmin();
 
-  if (!user || user.role !== "ADMIN") {
-    redirect("/");
+  // Middleware handles the redirect, but double-check here
+  if (!admin) {
+    redirect("/admin/login");
   }
 
   const navItems = [
@@ -30,7 +32,8 @@ export default async function AdminLayout({
           <div className="card">
             <div className="mb-4 pb-4 border-b border-border">
               <p className="font-semibold text-foreground">Admin Panel</p>
-              <p className="text-sm text-secondary">{user.name}</p>
+              <p className="text-sm text-secondary">{admin.name}</p>
+              <p className="text-xs text-secondary">{admin.email}</p>
             </div>
             <nav className="space-y-1">
               {navItems.map((item) => (
@@ -44,6 +47,18 @@ export default async function AdminLayout({
                 </Link>
               ))}
             </nav>
+            {/* Logout Button */}
+            <div className="mt-4 pt-4 border-t border-border">
+              <form action={adminLogout}>
+                <button
+                  type="submit"
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-red-600 hover:bg-red-50 transition-colors"
+                >
+                  <span>🚪</span>
+                  Çıkış Yap
+                </button>
+              </form>
+            </div>
           </div>
         </aside>
 

@@ -6,17 +6,37 @@ const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || "fallback-secret-change-in-production"
 );
 
-interface JWTPayload {
+interface AdminJWTPayload {
+  adminId: string;
+  email: string;
+  role: string;
+  name: string;
+}
+
+interface UserJWTPayload {
   userId: string;
   email: string;
   role: string;
   name: string;
 }
 
-async function verifyTokenInMiddleware(token: string): Promise<JWTPayload | null> {
+async function verifyAdminToken(token: string): Promise<AdminJWTPayload | null> {
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
-    return payload as unknown as JWTPayload;
+    // Check if it's an admin token (has adminId)
+    if (payload.adminId && payload.role === "ADMIN") {
+      return payload as unknown as AdminJWTPayload;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+async function verifyUserToken(token: string): Promise<UserJWTPayload | null> {
+  try {
+    const { payload } = await jwtVerify(token, JWT_SECRET);
+    return payload as unknown as UserJWTPayload;
   } catch {
     return null;
   }
@@ -24,58 +44,79 @@ async function verifyTokenInMiddleware(token: string): Promise<JWTPayload | null
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const token = request.cookies.get("fasonbul-auth")?.value;
 
-  // Protected routes that require authentication
-  const protectedRoutes = ["/hesap", "/admin"];
-  const adminRoutes = ["/admin"];
+  // Get both tokens
+  const adminToken = request.cookies.get("admin-token")?.value;
+  const userToken = request.cookies.get("fasonbul-auth")?.value;
 
-  // Check if the current path starts with any protected route
-  const isProtectedRoute = protectedRoutes.some((route) =>
-    pathname.startsWith(route)
-  );
-  const isAdminRoute = adminRoutes.some((route) =>
-    pathname.startsWith(route)
-  );
+  // =====================
+  // ADMIN ROUTES
+  // =====================
+  if (pathname.startsWith("/admin")) {
+    // Allow /admin/login without auth
+    if (pathname === "/admin/login") {
+      // If already logged in as admin, redirect to dashboard
+      if (adminToken) {
+        const payload = await verifyAdminToken(adminToken);
+        if (payload) {
+          console.log("ADMIN ALREADY LOGGED IN - Redirecting to /admin");
+          return NextResponse.redirect(new URL("/admin", request.url));
+        }
+      }
+      return NextResponse.next();
+    }
 
-  // If accessing protected route without token, redirect to login
-  if (isProtectedRoute && !token) {
-    const loginUrl = new URL("/giris", request.url);
-    loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  // If accessing admin route, verify the token and check role
-  if (isAdminRoute && token) {
-    const payload = await verifyTokenInMiddleware(token);
-
-    // Debug logging
+    // All other /admin/* routes require admin-token
     console.log("ADMIN ROUTE ACCESS - Path:", pathname);
-    console.log("USER ROLE:", payload?.role);
+    console.log("ADMIN TOKEN EXISTS:", !!adminToken);
+
+    if (!adminToken) {
+      console.log("NO ADMIN TOKEN - Redirecting to /admin/login");
+      return NextResponse.redirect(new URL("/admin/login", request.url));
+    }
+
+    const payload = await verifyAdminToken(adminToken);
+    console.log("ADMIN TOKEN VALID:", !!payload);
+    console.log("ADMIN PAYLOAD:", payload);
 
     if (!payload) {
-      // Invalid token - redirect to login
+      console.log("INVALID ADMIN TOKEN - Redirecting to /admin/login");
+      return NextResponse.redirect(new URL("/admin/login", request.url));
+    }
+
+    console.log("ADMIN ACCESS GRANTED - Email:", payload.email);
+    return NextResponse.next();
+  }
+
+  // =====================
+  // USER ROUTES (/hesap)
+  // =====================
+  if (pathname.startsWith("/hesap")) {
+    if (!userToken) {
       const loginUrl = new URL("/giris", request.url);
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
 
-    if (payload.role !== "ADMIN") {
-      // User is not admin - redirect to /hesap
-      console.log("ACCESS DENIED - User role is:", payload.role, "- Redirecting to /hesap");
-      return NextResponse.redirect(new URL("/hesap", request.url));
+    const payload = await verifyUserToken(userToken);
+    if (!payload) {
+      const loginUrl = new URL("/giris", request.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(loginUrl);
     }
-
-    // User is admin - allow access
-    console.log("ACCESS GRANTED - Admin user:", payload.email);
   }
 
-  // If logged in and trying to access auth pages, redirect to account
+  // =====================
+  // AUTH ROUTES (login/register)
+  // =====================
   const authRoutes = ["/giris", "/kayit"];
   const isAuthRoute = authRoutes.some((route) => pathname === route);
 
-  if (isAuthRoute && token) {
-    return NextResponse.redirect(new URL("/hesap", request.url));
+  if (isAuthRoute && userToken) {
+    const payload = await verifyUserToken(userToken);
+    if (payload) {
+      return NextResponse.redirect(new URL("/hesap", request.url));
+    }
   }
 
   return NextResponse.next();
