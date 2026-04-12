@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Logo from "@/components/ui/Logo";
+import TrustBadges from "@/components/ui/TrustBadges";
 import { SECTORS, CITIES } from "@/lib/constants";
 
 export default function Footer() {
@@ -159,6 +160,10 @@ export default function Footer() {
             >
               KVKK Aydınlatma Metni
             </Link>
+          </div>
+          {/* Trust Badges */}
+          <div className="mb-6">
+            <TrustBadges />
           </div>
           {/* Copyright */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">

@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import Link from "next/link";
 import { register, AuthState } from "@/actions/auth";
 import { CITIES } from "@/lib/constants";
+import TrustBadges from "@/components/ui/TrustBadges";
 
 const initialState: AuthState = {};
 
@@ -174,6 +175,11 @@ export default function RegisterPage() {
             <Link href="/giris" className="text-primary hover:underline">
               Giriş Yap
             </Link>
+          </div>
+
+          {/* Trust Badges */}
+          <div className="mt-6 pt-6 border-t border-border">
+            <TrustBadges variant="grid" size="sm" />
           </div>
         </div>
       </div>

@@ -3,6 +3,8 @@ import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { SECTORS, CITIES, JOB_STATUS, FEATURED_PER_SECTOR, MAX_FEATURED_TOTAL } from "@/lib/constants";
 import JobCard from "@/components/jobs/JobCard";
+import TestimonialSection from "@/components/home/TestimonialSection";
+import StickyMobileCTA from "@/components/ui/StickyMobileCTA";
 
 export const metadata: Metadata = {
   title: "FasonBul - Türkiye'nin Fason Üretim Platformu | Fason İş İlanları 2026",
@@ -450,6 +452,9 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Testimonials Section */}
+      <TestimonialSection />
+
       {/* Why FasonBul - Trust Section */}
       <section className="py-16 md:py-20 bg-gradient-to-br from-primary-light/50 via-white to-orange-50/50">
         <div className="container-custom">
@@ -603,6 +608,9 @@ export default async function HomePage() {
           </p>
         </div>
       </section>
+
+      {/* Sticky Mobile CTA */}
+      <StickyMobileCTA />
     </div>
   );
 }
