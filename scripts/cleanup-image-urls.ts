@@ -11,10 +11,15 @@
  */
 
 import { PrismaClient } from "@prisma/client";
+import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { existsSync } from "fs";
 import path from "path";
 
-const prisma = new PrismaClient();
+const adapter = new PrismaBetterSqlite3({
+  url: process.env.DATABASE_URL || "file:./dev.db",
+});
+
+const prisma = new PrismaClient({ adapter });
 
 function isValidImageUrl(url: string | null | undefined): boolean {
   if (!url || typeof url !== "string") return false;
