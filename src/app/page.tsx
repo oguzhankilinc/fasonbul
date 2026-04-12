@@ -5,7 +5,7 @@ import { SECTORS, CITIES, JOB_STATUS, FEATURED_PER_SECTOR, MAX_FEATURED_TOTAL } 
 import JobCard from "@/components/jobs/JobCard";
 
 export const metadata: Metadata = {
-  title: "FasonBul - Türkiye'nin #1 Fason Üretim Platformu | Fason İş İlanları 2026",
+  title: "FasonBul - Türkiye'nin Fason Üretim Platformu | Fason İş İlanları 2026",
   description:
     "Türkiye'nin en kapsamlı fason iş ilanları platformu. Otomotiv, mobilya, tekstil, kimya, baskı, paketleme ve el işi sektörlerinde fason üretici ve iş sahiplerini buluşturuyoruz. Komisyon yok, aracı yok, sonsuza kadar ücretsiz. Hemen ücretsiz kayıt olun!",
   keywords: [
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     "ücretsiz fason ilan",
   ],
   openGraph: {
-    title: "FasonBul - Türkiye'nin #1 Fason Üretim Platformu",
+    title: "FasonBul - Türkiye'nin Fason Üretim Platformu",
     description:
       "Fason iş ilanları verin veya arayın. 7 sektörde fason üretici ve iş sahiplerini buluşturuyoruz. Komisyon yok, aracı yok, sonsuza kadar ücretsiz!",
     type: "website",
@@ -135,44 +135,27 @@ async function getStats() {
   };
 }
 
-// Highlight box data with trust-building descriptions
-const highlights = [
+// Trust indicators for the trust block
+const trustItems = [
   {
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-      </svg>
-    ),
-    title: "Fason Üretimin Adresi",
-    subtitle: "Türkiye'nin 81 ilinde",
-  },
-  {
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
+    icon: "💰",
     title: "Komisyon Yok",
-    subtitle: "%0 komisyon, her zaman",
+    description: "Hiçbir işlemden kesinti yapılmaz",
   },
   {
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-      </svg>
-    ),
-    title: "Aracı Yok",
-    subtitle: "Doğrudan iletişim",
+    icon: "✨",
+    title: "%100 Ücretsiz",
+    description: "İlan vermek tamamen ücretsiz",
   },
   {
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-      </svg>
-    ),
-    title: "Sonsuza Kadar Ücretsiz",
-    subtitle: "Gizli ücret yok",
+    icon: "🇹🇷",
+    title: "Türkiye Geneli Ağ",
+    description: "81 ilde üretici ağı",
+  },
+  {
+    icon: "⚡",
+    title: "Hızlı Eşleşme",
+    description: "Dakikalar içinde ulaşın",
   },
 ];
 
@@ -196,57 +179,73 @@ export default async function HomePage() {
 
   return (
     <div>
-      {/* Hero Section with Highlight Boxes */}
-      <section className="hero-gradient py-12 md:py-16 border-b border-border">
+      {/* Hero Section - Conversion Focused */}
+      <section className="hero-gradient py-16 md:py-24 border-b border-border">
         <div className="container-custom">
-          {/* Highlight Boxes - Trust Signals */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-            {highlights.map((item, index) => (
-              <div key={index} className="highlight-box">
-                <div className="highlight-icon">
-                  {item.icon}
-                </div>
-                <div>
-                  <span className="highlight-text block">{item.title}</span>
-                  <span className="text-xs text-secondary font-medium">{item.subtitle}</span>
-                </div>
+          {/* Main Hero Content */}
+          <div className="text-center max-w-4xl mx-auto mb-16">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 tracking-tight leading-tight">
+              Fason İşlerinizi{" "}
+              <span className="text-primary">Doğru Üreticiyle</span>{" "}
+              Buluşturun
+            </h1>
+            <p className="text-lg md:text-xl text-secondary mb-10 leading-relaxed max-w-2xl mx-auto">
+              Türkiye&apos;nin en hızlı büyüyen fason üretim platformu.{" "}
+              <strong className="text-foreground">Ücretsiz ilan verin</strong>, doğru atölyeye ulaşın.
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
+              <Link href="/kayit" className="cta-primary group">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Ücretsiz İlan Ver
+                <svg className="w-4 h-4 opacity-0 -ml-2 group-hover:opacity-100 group-hover:ml-0 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+              <Link href="/ilanlar" className="cta-secondary">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                İlanları Keşfet
+              </Link>
+            </div>
+
+            {/* Helper Text */}
+            <p className="text-sm text-secondary">
+              <span className="inline-flex items-center gap-1">
+                <svg className="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                2 dakikada ilan oluştur
+              </span>
+            </p>
+          </div>
+
+          {/* Trust Block - 4 Column */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 max-w-4xl mx-auto mb-16">
+            {trustItems.map((item, index) => (
+              <div
+                key={index}
+                className="bg-white/80 backdrop-blur-sm border border-border rounded-2xl p-5 text-center hover:shadow-lg hover:border-primary/30 hover:-translate-y-1 transition-all duration-300"
+              >
+                <span className="text-3xl md:text-4xl mb-3 block">{item.icon}</span>
+                <h3 className="font-bold text-foreground text-sm md:text-base mb-1">{item.title}</h3>
+                <p className="text-xs md:text-sm text-secondary">{item.description}</p>
               </div>
             ))}
           </div>
 
-          {/* Main Hero Content */}
-          <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 tracking-tight leading-tight">
-              Türkiye&apos;nin <span className="text-primary">#1 Fason Üretim</span> Platformu
-            </h1>
-            <p className="text-lg md:text-xl text-secondary mb-10 leading-relaxed max-w-2xl mx-auto">
-              Otomotiv, mobilya, tekstil, kimya ve daha birçok sektörde fason iş ilanlarını keşfedin.
-              <strong className="text-foreground"> Komisyonsuz</strong> ve <strong className="text-foreground">aracısız</strong> doğrudan buluşun.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/ilanlar" className="cta-primary">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                Fason İş İlanlarını Keşfet
-              </Link>
-              <Link href="/kayit" className="cta-secondary">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                </svg>
-                Ücretsiz Kayıt Ol
-              </Link>
-            </div>
-          </div>
-
           {/* Stats */}
-          <div className="mt-12 grid grid-cols-3 gap-4 md:gap-6 max-w-2xl mx-auto">
+          <div className="grid grid-cols-3 gap-4 md:gap-6 max-w-2xl mx-auto">
             <div className="stat-card">
               <div className="stat-value text-primary">{stats.totalJobs}+</div>
               <div className="stat-label">Aktif İlan</div>
             </div>
             <div className="stat-card">
-              <div className="stat-value text-primary">{stats.totalCities}</div>
+              <div className="stat-value text-primary">{stats.totalCities || 81}</div>
               <div className="stat-label">Şehir</div>
             </div>
             <div className="stat-card">
@@ -257,13 +256,18 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Featured Listings - Vitrin */}
-      <section className="py-14 md:py-16">
+      {/* Featured Listings - Öne Çıkan İlanlar */}
+      <section className="py-16 md:py-20">
         <div className="container-custom">
-          <div className="section-header">
+          {/* Section Header */}
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
             <div>
-              <h2 className="section-title">Vitrin İlanları</h2>
-              <p className="section-subtitle">En güncel fason iş fırsatlarını keşfedin</p>
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                Öne Çıkan İlanlar
+              </h2>
+              <p className="text-secondary">
+                En güncel ve aktif fason iş ilanları
+              </p>
             </div>
             <Link href="/ilanlar" className="btn-primary hidden sm:inline-flex">
               Tüm İlanlar
@@ -273,18 +277,25 @@ export default async function HomePage() {
             </Link>
           </div>
 
+          {/* Empty State or Job Listings */}
           {jobs.length === 0 ? (
-            <div className="text-center py-16 card">
-              <div className="text-6xl mb-6">📭</div>
-              <h3 className="text-xl font-bold text-foreground mb-3">
-                Henüz ilan bulunamadı
+            <div className="text-center py-20 bg-gradient-to-br from-muted via-white to-primary-light/20 rounded-3xl border-2 border-dashed border-border">
+              <div className="text-7xl mb-6">📭</div>
+              <h3 className="text-2xl font-bold text-foreground mb-3">
+                Henüz ilan yok
               </h3>
-              <p className="text-secondary mb-8 max-w-md mx-auto">
-                İlk ilanı siz oluşturun ve Türkiye genelindeki fason üreticilere ulaşın. Tamamen ücretsiz!
+              <p className="text-secondary mb-8 max-w-md mx-auto text-lg">
+                İlk ilanı sen ver, üreticiler sana ulaşsın.
               </p>
-              <Link href="/kayit" className="btn-primary-lg">
+              <Link href="/kayit" className="cta-primary inline-flex">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
                 Ücretsiz İlan Ver
               </Link>
+              <p className="text-sm text-secondary mt-4">
+                Kayıt ol ve 2 dakikada ilanını oluştur
+              </p>
             </div>
           ) : (
             <>
@@ -293,8 +304,8 @@ export default async function HomePage() {
                 if (sectorJobs.length === 0) return null;
 
                 return (
-                  <div key={sector.value} className="mb-12">
-                    <div className="flex items-center justify-between mb-5">
+                  <div key={sector.value} className="mb-14">
+                    <div className="flex items-center justify-between mb-6">
                       <h3 className="text-xl font-bold text-foreground flex items-center gap-3">
                         <span className="text-3xl">{sector.icon}</span>
                         <span>{sector.label}</span>
@@ -336,11 +347,15 @@ export default async function HomePage() {
       </section>
 
       {/* Sector Quick Links */}
-      <section className="py-14 md:py-16 bg-muted border-t border-b border-border">
+      <section className="py-16 md:py-20 bg-muted border-t border-b border-border">
         <div className="container-custom">
-          <div className="text-center mb-10">
-            <h2 className="section-title">Sektörlere Göre Fason İş İlanları</h2>
-            <p className="section-subtitle">İlgilendiğiniz sektörü seçin ve fırsatları keşfedin</p>
+          <div className="text-center mb-12">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
+              Sektörlere Göre Fason İş İlanları
+            </h2>
+            <p className="text-secondary">
+              İlgilendiğiniz sektörü seçin ve fırsatları keşfedin
+            </p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4">
             {SECTORS.map((sector) => (
@@ -358,11 +373,15 @@ export default async function HomePage() {
       </section>
 
       {/* Popular Cities - Internal Linking */}
-      <section className="py-14 md:py-16 border-b border-border">
+      <section className="py-16 md:py-20 border-b border-border">
         <div className="container-custom">
-          <div className="text-center mb-10">
-            <h2 className="section-title">Şehirlere Göre Fason İş İlanları</h2>
-            <p className="section-subtitle">Türkiye&apos;nin önemli üretim merkezlerinde fason iş fırsatları</p>
+          <div className="text-center mb-12">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
+              Şehirlere Göre Fason İş İlanları
+            </h2>
+            <p className="text-secondary">
+              Türkiye&apos;nin önemli üretim merkezlerinde fason iş fırsatları
+            </p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
             {popularCities.map((city) => (
@@ -388,17 +407,62 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* How It Works Section */}
+      <section className="py-16 md:py-20 bg-white">
+        <div className="container-custom">
+          <div className="text-center mb-12">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
+              Nasıl Çalışır?
+            </h2>
+            <p className="text-secondary">
+              3 adımda fason üreticinizi bulun
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-primary-light rounded-2xl flex items-center justify-center mx-auto mb-5 text-2xl font-bold text-primary">
+                1
+              </div>
+              <h3 className="font-bold text-foreground mb-2 text-lg">Ücretsiz Kayıt Ol</h3>
+              <p className="text-secondary text-sm">
+                E-posta adresinizle hızlıca hesap oluşturun
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-primary-light rounded-2xl flex items-center justify-center mx-auto mb-5 text-2xl font-bold text-primary">
+                2
+              </div>
+              <h3 className="font-bold text-foreground mb-2 text-lg">İlanınızı Oluşturun</h3>
+              <p className="text-secondary text-sm">
+                Fason iş talebinizi detaylıca açıklayın
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-primary-light rounded-2xl flex items-center justify-center mx-auto mb-5 text-2xl font-bold text-primary">
+                3
+              </div>
+              <h3 className="font-bold text-foreground mb-2 text-lg">Üreticilerle Buluşun</h3>
+              <p className="text-secondary text-sm">
+                Doğru üreticiler sizinle iletişime geçsin
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Why FasonBul - Trust Section */}
-      <section className="py-14 md:py-16 bg-gradient-to-br from-primary-light/50 via-white to-orange-50/50">
+      <section className="py-16 md:py-20 bg-gradient-to-br from-primary-light/50 via-white to-orange-50/50">
         <div className="container-custom">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="section-title mb-4">Neden FasonBul?</h2>
-            <p className="section-subtitle mb-10 max-w-2xl mx-auto">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
+              Neden FasonBul?
+            </h2>
+            <p className="text-secondary mb-12 max-w-2xl mx-auto">
               Türkiye&apos;nin en güvenilir fason iş platformu olarak, iş sahipleri ve üreticileri
               doğrudan buluşturuyoruz.
             </p>
             <div className="grid md:grid-cols-3 gap-6">
-              <div className="bg-white rounded-2xl p-8 shadow-sm border border-border">
+              <div className="bg-white rounded-2xl p-8 shadow-sm border border-border hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                 <div className="w-14 h-14 bg-success-light rounded-2xl flex items-center justify-center mx-auto mb-5">
                   <svg className="w-7 h-7 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -409,7 +473,7 @@ export default async function HomePage() {
                   İlan vermek ve görüntülemek tamamen ücretsiz. Gizli ücret veya komisyon yok.
                 </p>
               </div>
-              <div className="bg-white rounded-2xl p-8 shadow-sm border border-border">
+              <div className="bg-white rounded-2xl p-8 shadow-sm border border-border hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                 <div className="w-14 h-14 bg-primary-light rounded-2xl flex items-center justify-center mx-auto mb-5">
                   <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -420,7 +484,7 @@ export default async function HomePage() {
                   İlanınız anında yayına girer, doğru üreticilerle hızlıca buluşursunuz.
                 </p>
               </div>
-              <div className="bg-white rounded-2xl p-8 shadow-sm border border-border">
+              <div className="bg-white rounded-2xl p-8 shadow-sm border border-border hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                 <div className="w-14 h-14 bg-warning-light rounded-2xl flex items-center justify-center mx-auto mb-5">
                   <svg className="w-7 h-7 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -437,7 +501,7 @@ export default async function HomePage() {
       </section>
 
       {/* SEO Content */}
-      <section className="py-14 md:py-16">
+      <section className="py-16 md:py-20">
         <div className="container-custom">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6">
@@ -511,7 +575,7 @@ export default async function HomePage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-14 md:py-16 bg-gradient-to-r from-primary to-primary-hover text-white">
+      <section className="py-16 md:py-20 bg-gradient-to-r from-primary to-primary-hover text-white">
         <div className="container-custom text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
             Fason Üretim Ortağınızı Bugün Bulun
@@ -523,9 +587,9 @@ export default async function HomePage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/kayit"
-              className="inline-flex items-center justify-center gap-2 bg-white text-primary px-8 py-4 rounded-2xl font-bold text-lg hover:bg-gray-100 transition-colors"
+              className="inline-flex items-center justify-center gap-2 bg-white text-primary px-8 py-4 rounded-2xl font-bold text-lg hover:bg-gray-100 hover:scale-105 transition-all"
             >
-              Ücretsiz Kayıt Ol
+              Ücretsiz İlan Ver
             </Link>
             <Link
               href="/ilanlar"
@@ -534,6 +598,9 @@ export default async function HomePage() {
               İlanları İncele
             </Link>
           </div>
+          <p className="text-white/70 text-sm mt-6">
+            2 dakikada kayıt ol, hemen ilan ver
+          </p>
         </div>
       </section>
     </div>
