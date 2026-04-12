@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { getSectorIcon } from "@/lib/constants";
+import { isValidImageUrl } from "@/lib/image-utils";
 
 interface JobDetailImageProps {
   imageUrl: string | null;
@@ -13,7 +14,8 @@ interface JobDetailImageProps {
 export default function JobDetailImage({ imageUrl, title, sector, sectorLabel }: JobDetailImageProps) {
   const [hasError, setHasError] = useState(false);
 
-  if (!imageUrl || hasError) {
+  // Show fallback if URL is invalid or image failed to load
+  if (!isValidImageUrl(imageUrl) || hasError) {
     return (
       <div className="relative aspect-[16/9] w-full bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 flex items-center justify-center">
         <div className="text-center">
