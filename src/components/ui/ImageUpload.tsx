@@ -124,7 +124,6 @@ export default function ImageUpload({ onImageUploaded, onUploadingChange, curren
         ref={fileInputRef}
         type="file"
         accept="image/jpeg,image/jpg,image/png,image/webp"
-        capture="environment"
         onChange={handleFileSelect}
         className="hidden"
         id="job-image-upload"
@@ -204,7 +203,7 @@ export default function ImageUpload({ onImageUploaded, onUploadingChange, curren
               Fotoğraf Ekle
             </p>
             <p className="text-xs text-secondary">
-              Tıklayın veya sürükleyin
+              Galeriden seçin veya fotoğraf çekin
             </p>
             <p className="text-xs text-secondary mt-2">
               JPG, PNG veya WebP • Maks. 10MB
