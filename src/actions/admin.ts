@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentAdmin } from "@/lib/admin-auth";
 import { JOB_STATUS } from "@/lib/constants";
 
 export type AdminState = {
@@ -11,11 +11,11 @@ export type AdminState = {
 };
 
 async function requireAdmin() {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "ADMIN") {
+  const admin = await getCurrentAdmin();
+  if (!admin) {
     throw new Error("Unauthorized");
   }
-  return user;
+  return admin;
 }
 
 export async function approveJob(jobId: string): Promise<AdminState> {
