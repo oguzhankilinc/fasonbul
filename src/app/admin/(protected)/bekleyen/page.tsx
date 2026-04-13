@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { JOB_STATUS } from "@/lib/constants";
 import AdminJobList from "../../components/AdminJobList";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Bekleyen İlanlar",
 };

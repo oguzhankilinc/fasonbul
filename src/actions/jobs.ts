@@ -69,6 +69,10 @@ export async function createJob(
     },
   });
 
+  // Revalidate paths before redirect
+  revalidatePath("/admin/bekleyen");
+  revalidatePath("/hesap/ilanlarim");
+
   redirect("/hesap/ilanlarim?created=true");
 }
 

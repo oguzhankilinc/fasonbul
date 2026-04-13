@@ -115,14 +115,12 @@ export default function AdminJobList({
           >
             <div className="flex flex-col md:flex-row gap-4">
               {/* Image Thumbnail */}
-              <div className="flex-shrink-0">
-                <div className="relative w-full md:w-32 h-24 rounded-lg overflow-hidden bg-gray-600">
-                  <AdminJobThumbnail
-                    imageUrl={job.imageUrl}
-                    title={job.title}
-                    sector={job.sector}
-                  />
-                </div>
+              <div className="flex-shrink-0 w-full md:w-36">
+                <AdminJobThumbnail
+                  imageUrl={job.imageUrl}
+                  title={job.title}
+                  sector={job.sector}
+                />
               </div>
 
               {/* Content */}
