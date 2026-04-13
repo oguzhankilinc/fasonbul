@@ -212,16 +212,23 @@ export async function toggleFeatured(jobId: string): Promise<AdminState> {
     return { error: "İlan bulunamadı." };
   }
 
+  const newFeaturedStatus = !job.isFeatured;
+
   await prisma.jobRequest.update({
     where: { id: jobId },
     data: {
-      isFeatured: !job.isFeatured,
+      isFeatured: newFeaturedStatus,
     },
   });
 
+  // Comprehensive revalidation for featured changes
   revalidatePath("/admin/aktif");
+  revalidatePath("/admin"); // Dashboard featured count
   revalidatePath("/");
   revalidatePath("/ilanlar");
+  revalidatePath(`/ilan/${jobId}`);
+  revalidatePath(`/kategori/${job.sector}`);
+  revalidatePath(`/sehir/${job.city}`);
 
   return { success: true };
 }
