@@ -14,27 +14,39 @@ function getResend(): Resend | null {
   return resendClient;
 }
 
-// Base URL for links in emails
-const getBaseUrl = () => {
-  return process.env.NEXT_PUBLIC_BASE_URL || "https://fasonbul.com";
-};
+// Base URL for links in emails - normalized without trailing slash
+function getBaseUrl(): string {
+  const url = process.env.NEXT_PUBLIC_BASE_URL || "https://fasonbul.com";
+  return url.replace(/\/+$/, ""); // Remove trailing slashes
+}
+
+// Build absolute URL from path - handles leading slashes safely
+function buildUrl(path: string): string {
+  const base = getBaseUrl();
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  return `${base}${cleanPath}`;
+}
 
 // Email sender configuration
-const getFromEmail = () => {
+function getFromEmail(): string {
   return process.env.EMAIL_FROM || "FasonBul <noreply@fasonbul.com>";
-};
+}
 
-// Shared email footer
-const emailFooter = `
+// Shared email footer - called at runtime
+function getEmailFooter(): string {
+  return `
   <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 32px 0;" />
   <p style="color: #6b7280; font-size: 12px; margin: 0;">
     Bu e-posta FasonBul tarafindan gonderilmistir.<br />
     <a href="${getBaseUrl()}" style="color: #f97316;">fasonbul.com</a> - Turkiye'nin Fason Uretim Platformu
   </p>
 `;
+}
 
-// Shared email wrapper
-const wrapEmail = (content: string) => `
+// Shared email wrapper - called at runtime
+function wrapEmail(content: string): string {
+  const logoUrl = buildUrl("/logo/fasonbul-logo.png");
+  return `
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -43,13 +55,14 @@ const wrapEmail = (content: string) => `
 </head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #111827; max-width: 600px; margin: 0 auto; padding: 20px;">
   <div style="text-align: center; margin-bottom: 32px;">
-    <img src="${getBaseUrl()}/logo/fasonbul-logo.png" alt="FasonBul" style="height: 40px;" />
+    <img src="${logoUrl}" alt="FasonBul" style="height: 40px;" />
   </div>
   ${content}
-  ${emailFooter}
+  ${getEmailFooter()}
 </body>
 </html>
 `;
+}
 
 // ============================================
 // EMAIL TYPES
@@ -85,7 +98,7 @@ export async function sendWelcomeEmail(
       ${actionText}
     </p>
     <div style="margin-bottom: 24px;">
-      <a href="${getBaseUrl()}/hesap"
+      <a href="${buildUrl("/hesap")}"
          style="display: inline-block; background-color: #f97316; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600;">
         Hesabima Git
       </a>
@@ -123,7 +136,7 @@ export async function sendPasswordResetEmail(
   name: string,
   resetToken: string
 ): Promise<EmailResult> {
-  const resetUrl = `${getBaseUrl()}/sifre-sifirla?token=${resetToken}`;
+  const resetUrl = buildUrl(`/sifre-sifirla?token=${resetToken}`);
 
   const html = wrapEmail(`
     <h1 style="color: #111827; font-size: 24px; margin-bottom: 16px;">
@@ -201,7 +214,7 @@ export async function sendJobSubmittedEmail(
       </p>
     </div>
     <div style="margin-bottom: 24px;">
-      <a href="${getBaseUrl()}/hesap/ilanlarim"
+      <a href="${buildUrl("/hesap/ilanlarim")}"
          style="display: inline-block; background-color: #f97316; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600;">
         Ilanlarimi Gor
       </a>
@@ -237,7 +250,7 @@ export async function sendJobApprovedEmail(
   jobTitle: string,
   jobId: string
 ): Promise<EmailResult> {
-  const jobUrl = `${getBaseUrl()}/ilan/${jobId}`;
+  const jobUrl = buildUrl(`/ilan/${jobId}`);
 
   const html = wrapEmail(`
     <h1 style="color: #111827; font-size: 24px; margin-bottom: 16px;">
@@ -317,7 +330,7 @@ export async function sendJobRejectedEmail(
       Ilaninizi duzenleyerek tekrar gonderebilirsiniz. Duzenlediginizde otomatik olarak yeniden incelemeye alinacaktir.
     </p>
     <div style="margin-bottom: 24px;">
-      <a href="${getBaseUrl()}/hesap/ilanlarim"
+      <a href="${buildUrl("/hesap/ilanlarim")}"
          style="display: inline-block; background-color: #f97316; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600;">
         Ilanimi Duzenle
       </a>
