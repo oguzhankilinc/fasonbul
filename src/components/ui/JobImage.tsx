@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { getSectorIcon } from "@/lib/constants";
 import { normalizeImageUrl } from "@/lib/image-utils";
 
@@ -17,14 +17,31 @@ interface JobImageProps {
  * - imageUrl'i normalize eder (legacy /uploads → /api/images)
  * - Görsel varsa gösterir
  * - Görsel yoksa veya hata olursa fallback gösterir
- * - Basit, anlaşılır, tek kaynak
+ * - Hard refresh'te de kararlı çalışır (hydration sonrası img.complete kontrolü)
  */
 export default function JobImage({ imageUrl, alt, sector, size = "card" }: JobImageProps) {
   const [hasError, setHasError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
 
   // URL'yi normalize et (legacy path → API path)
   const normalizedUrl = normalizeImageUrl(imageUrl);
+
+  // Hydration sonrası: görsel zaten yüklenmişse state'i güncelle
+  useEffect(() => {
+    const img = imgRef.current;
+    if (!img) return;
+
+    // Görsel zaten yüklendiyse (cache'den veya hızlı yükleme)
+    if (img.complete) {
+      if (img.naturalWidth > 0) {
+        setIsLoaded(true);
+      } else {
+        // complete ama naturalWidth=0 → yükleme hatası
+        setHasError(true);
+      }
+    }
+  }, [normalizedUrl]);
 
   // Görsel gösterilecek mi?
   const showImage = normalizedUrl !== null && !hasError;
@@ -64,6 +81,7 @@ export default function JobImage({ imageUrl, alt, sector, size = "card" }: JobIm
       {showImage && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
+          ref={imgRef}
           src={normalizedUrl}
           alt={alt}
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
