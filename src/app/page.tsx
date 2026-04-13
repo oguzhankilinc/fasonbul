@@ -64,15 +64,15 @@ interface FeaturedJob {
 }
 
 async function getFeaturedJobs(): Promise<FeaturedJob[]> {
-  // Single deterministic query: featured jobs first, then recent active jobs
-  // This ensures consistent ordering on every page load
+  // STRICT FILTER: Only admin-featured jobs appear in "Vitrin İlanları"
+  // Non-featured jobs will NEVER appear in this section
   const jobs = await prisma.jobRequest.findMany({
     where: {
       status: JOB_STATUS.ACTIVE,
+      isFeatured: true,  // STRICT: Only admin-selected featured jobs
     },
     orderBy: [
-      { isFeatured: "desc" },  // Featured first
-      { createdAt: "desc" },   // Then by creation date
+      { createdAt: "desc" },  // Most recent featured first
     ],
     take: MAX_FEATURED_TOTAL,
     select: {
@@ -233,17 +233,17 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Featured Listings - Öne Çıkan İlanlar */}
+      {/* Vitrin İlanları - Admin tarafından seçilen öne çıkan ilanlar */}
       <section className="py-16 md:py-20">
         <div className="container-custom">
           {/* Section Header */}
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
             <div>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                Öne Çıkan İlanlar
+                Vitrin İlanları
               </h2>
               <p className="text-secondary">
-                En güncel ve aktif fason iş ilanları
+                Editör seçkisi fason iş fırsatları
               </p>
             </div>
             <Link href="/ilanlar" className="btn-primary hidden sm:inline-flex">
@@ -256,23 +256,20 @@ export default async function HomePage() {
 
           {/* Empty State or Job Listings */}
           {jobs.length === 0 ? (
-            <div className="text-center py-20 bg-gradient-to-br from-muted via-white to-primary-light/20 rounded-3xl border-2 border-dashed border-border">
-              <div className="text-7xl mb-6">📭</div>
-              <h3 className="text-2xl font-bold text-foreground mb-3">
-                Henüz ilan yok
+            <div className="text-center py-16 bg-gradient-to-br from-muted via-white to-primary-light/20 rounded-3xl border-2 border-dashed border-border">
+              <div className="text-6xl mb-4">⭐</div>
+              <h3 className="text-xl font-bold text-foreground mb-2">
+                Vitrin hazırlanıyor
               </h3>
-              <p className="text-secondary mb-8 max-w-md mx-auto text-lg">
-                İlk ilanı sen ver, üreticiler sana ulaşsın.
+              <p className="text-secondary mb-6 max-w-md mx-auto">
+                Vitrin ilanları yakında burada görünecek.
               </p>
-              <Link href="/kayit" className="cta-primary inline-flex">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              <Link href="/ilanlar" className="btn-primary inline-flex">
+                Tüm İlanları Keşfet
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
-                Ücretsiz İlan Ver
               </Link>
-              <p className="text-sm text-secondary mt-4">
-                Kayıt ol ve 2 dakikada ilanını oluştur
-              </p>
             </div>
           ) : (
             <>
