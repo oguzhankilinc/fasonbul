@@ -6,6 +6,9 @@ import JobCard from "@/components/jobs/JobCard";
 import TestimonialSection from "@/components/home/TestimonialSection";
 import StickyMobileCTA from "@/components/ui/StickyMobileCTA";
 
+// Force dynamic rendering to always get fresh job data
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "FasonBul - Türkiye'nin Fason Üretim Platformu | Fason İş İlanları 2026",
   description:
@@ -84,12 +87,6 @@ async function getFeaturedJobs(): Promise<FeaturedJob[]> {
       expiresAt: true,
       isFeatured: true,
     },
-  });
-
-  // DEBUG: Log jobs with their imageUrls
-  console.log("[DEBUG Homepage] Jobs count:", jobs.length);
-  jobs.forEach((job, i) => {
-    console.log(`[DEBUG Homepage] Job ${i}: id=${job.id}, imageUrl=${JSON.stringify(job.imageUrl)}`);
   });
 
   return jobs;

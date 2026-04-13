@@ -7,6 +7,9 @@ import JobFilters from "@/components/jobs/JobFilters";
 import JobList from "@/components/jobs/JobList";
 import Pagination from "@/components/ui/Pagination";
 
+// Force dynamic rendering to always get fresh job data
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Tüm Fason İş İlanları 2026 | Türkiye Geneli Fason Üretim Fırsatları",
   description:
@@ -109,12 +112,6 @@ async function getJobs(
     }),
     prisma.jobRequest.count({ where }),
   ]);
-
-  // DEBUG: Log jobs with their imageUrls
-  console.log("[DEBUG Listings] Jobs count:", jobs.length);
-  jobs.forEach((job, i) => {
-    console.log(`[DEBUG Listings] Job ${i}: id=${job.id}, imageUrl=${JSON.stringify(job.imageUrl)}`);
-  });
 
   return {
     jobs,

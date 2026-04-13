@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useActionState } from "react";
 import { useRouter } from "next/navigation";
 import { updateJob, JobState } from "@/actions/jobs";
@@ -31,6 +31,25 @@ export default function EditJobForm({ job }: EditJobFormProps) {
   const [imageUrl, setImageUrl] = useState<string>(job.imageUrl || "");
   const [isUploading, setIsUploading] = useState(false);
 
+  // Ref to guarantee imageUrl is synced to DOM before form submit
+  const imageUrlInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync initial imageUrl to DOM on mount
+  useEffect(() => {
+    if (imageUrlInputRef.current && job.imageUrl) {
+      imageUrlInputRef.current.value = job.imageUrl;
+    }
+  }, [job.imageUrl]);
+
+  // Handle image upload - update both state and DOM directly
+  const handleImageUploaded = useCallback((url: string) => {
+    setImageUrl(url);
+    // Directly update DOM to avoid any React batching race conditions
+    if (imageUrlInputRef.current) {
+      imageUrlInputRef.current.value = url;
+    }
+  }, []);
+
   if (state.success) {
     router.push("/hesap/ilanlarim");
     return null;
@@ -40,7 +59,12 @@ export default function EditJobForm({ job }: EditJobFormProps) {
     <div className="card">
       <form action={formAction} className="space-y-6">
         <input type="hidden" name="jobId" value={job.id} />
-        <input type="hidden" name="imageUrl" value={imageUrl} />
+        <input
+          ref={imageUrlInputRef}
+          type="hidden"
+          name="imageUrl"
+          defaultValue={job.imageUrl || ""}
+        />
 
         {state.error && (
           <div className="p-3 rounded-lg bg-red-50 text-red-600 text-sm">
@@ -104,7 +128,7 @@ export default function EditJobForm({ job }: EditJobFormProps) {
             İlan Fotoğrafı
           </h3>
           <ImageUpload
-            onImageUploaded={(url) => setImageUrl(url)}
+            onImageUploaded={handleImageUploaded}
             onUploadingChange={setIsUploading}
             currentImage={imageUrl || null}
           />

@@ -8,6 +8,9 @@ import JobFilters from "@/components/jobs/JobFilters";
 import JobList from "@/components/jobs/JobList";
 import Pagination from "@/components/ui/Pagination";
 
+// Force dynamic rendering to always get fresh job data
+export const dynamic = "force-dynamic";
+
 interface SectorPageProps {
   params: Promise<{ sector: string }>;
   searchParams: Promise<{ sayfa?: string }>;

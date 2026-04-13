@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useActionState } from "react";
 import { createJob, JobState } from "@/actions/jobs";
 import { SECTORS, CITIES, URGENCY_OPTIONS } from "@/lib/constants";
@@ -13,8 +13,17 @@ export default function CreateJobPage() {
   const [imageUrl, setImageUrl] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);
 
-  // DEBUG: Log imageUrl state changes
-  console.log("[DEBUG CreateJobPage] imageUrl state:", JSON.stringify(imageUrl));
+  // Ref to guarantee imageUrl is synced to DOM before form submit
+  const imageUrlInputRef = useRef<HTMLInputElement>(null);
+
+  // Handle image upload - update both state and DOM directly
+  const handleImageUploaded = useCallback((url: string) => {
+    setImageUrl(url);
+    // Directly update DOM to avoid any React batching race conditions
+    if (imageUrlInputRef.current) {
+      imageUrlInputRef.current.value = url;
+    }
+  }, []);
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -98,9 +107,14 @@ export default function CreateJobPage() {
               <span className="w-6 h-6 bg-primary-light text-primary rounded-full flex items-center justify-center text-xs font-bold">2</span>
               İlan Fotoğrafı
             </h3>
-            <input type="hidden" name="imageUrl" value={imageUrl} />
+            <input
+              ref={imageUrlInputRef}
+              type="hidden"
+              name="imageUrl"
+              defaultValue=""
+            />
             <ImageUpload
-              onImageUploaded={setImageUrl}
+              onImageUploaded={handleImageUploaded}
               onUploadingChange={setIsUploading}
               currentImage={imageUrl || null}
             />

@@ -21,12 +21,6 @@ export default async function PendingJobsPage() {
     },
   });
 
-  // DEBUG: Log jobs and their imageUrls
-  console.log("[DEBUG Admin Pending] Jobs count:", jobs.length);
-  jobs.forEach((job, i) => {
-    console.log(`[DEBUG Admin Pending] Job ${i}: id=${job.id}, imageUrl=${JSON.stringify(job.imageUrl)}`);
-  });
-
   return (
     <div>
       <h1 className="text-2xl font-bold text-white mb-6">

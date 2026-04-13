@@ -34,16 +34,6 @@ export async function createJob(
   const urgency = formData.get("urgency") as string;
   const imageUrl = formData.get("imageUrl") as string;
 
-  // DEBUG: Dump ALL form data entries
-  console.log("[DEBUG createJob] ===== ALL FORM DATA ENTRIES =====");
-  for (const [key, value] of formData.entries()) {
-    console.log(`[DEBUG createJob] ${key}:`, typeof value === "string" ? JSON.stringify(value) : value);
-  }
-  console.log("[DEBUG createJob] ===== END FORM DATA =====");
-  console.log("[DEBUG createJob] imageUrl parsed:", JSON.stringify(imageUrl));
-  console.log("[DEBUG createJob] imageUrl length:", imageUrl?.length);
-  console.log("[DEBUG createJob] Will save as:", JSON.stringify(imageUrl || null));
-
   // Validation
   if (!sector || !city || !title || !description || !phone || !whatsapp) {
     return { error: "Tüm zorunlu alanları doldurun." };
@@ -57,10 +47,7 @@ export async function createJob(
     return { error: "Açıklama en az 50 karakter olmalıdır." };
   }
 
-  // DEBUG: Log what we're about to save
-  console.log("[DEBUG createJob] Saving to DB with imageUrl:", JSON.stringify(imageUrl || null));
-
-  const created = await prisma.jobRequest.create({
+  await prisma.jobRequest.create({
     data: {
       ownerId: user.id,
       sector,
@@ -74,9 +61,6 @@ export async function createJob(
       status: JOB_STATUS.PENDING_APPROVAL,
     },
   });
-
-  // DEBUG: Log what was created
-  console.log("[DEBUG createJob] Created job:", created.id, "imageUrl:", created.imageUrl);
 
   redirect("/hesap/ilanlarim?created=true");
 }
