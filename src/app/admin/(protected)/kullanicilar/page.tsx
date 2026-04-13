@@ -106,13 +106,24 @@ export default async function UsersPage() {
     <div className="space-y-10">
       {/* İlan Veren Firmalar Section */}
       <section>
-        <div className="flex items-center gap-3 mb-4">
-          <h2 className="text-xl font-bold text-white">
-            İlan Veren Firmalar
-          </h2>
-          <span className="px-3 py-1 text-sm font-medium rounded-full bg-blue-500/20 text-blue-400">
-            {jobOwners.length}
-          </span>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <h2 className="text-xl font-bold text-white">
+              İlan Veren Firmalar
+            </h2>
+            <span className="px-3 py-1 text-sm font-medium rounded-full bg-blue-500/20 text-blue-400">
+              {jobOwners.length}
+            </span>
+          </div>
+          <a
+            href="/api/admin/export-users?role=JOB_OWNER"
+            className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-green-600/20 hover:bg-green-600/30 text-green-400 transition-colors inline-flex items-center gap-1.5"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Excel İndir
+          </a>
         </div>
 
         {jobOwners.length === 0 ? (
@@ -128,13 +139,24 @@ export default async function UsersPage() {
 
       {/* Fason Üreticiler / Atölyeler Section */}
       <section>
-        <div className="flex items-center gap-3 mb-4">
-          <h2 className="text-xl font-bold text-white">
-            Fason Üreticiler / Atölyeler
-          </h2>
-          <span className="px-3 py-1 text-sm font-medium rounded-full bg-purple-500/20 text-purple-400">
-            {manufacturers.length}
-          </span>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <h2 className="text-xl font-bold text-white">
+              Fason Üreticiler / Atölyeler
+            </h2>
+            <span className="px-3 py-1 text-sm font-medium rounded-full bg-purple-500/20 text-purple-400">
+              {manufacturers.length}
+            </span>
+          </div>
+          <a
+            href="/api/admin/export-users?role=MANUFACTURER"
+            className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-green-600/20 hover:bg-green-600/30 text-green-400 transition-colors inline-flex items-center gap-1.5"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Excel İndir
+          </a>
         </div>
 
         {manufacturers.length === 0 ? (

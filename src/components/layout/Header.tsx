@@ -19,7 +19,7 @@ interface HeaderProps {
 const sloganBadges = [
   { text: "Her Zaman Ücretsiz", icon: "gift" },
   { text: "Komisyon Yok", icon: "check" },
-  { text: "Senin İçin Vitrin", icon: "star" },
+  { text: "Senin İçin", icon: "star" },
 ];
 
 export default function Header({ user }: HeaderProps) {
