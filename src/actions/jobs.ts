@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { JOB_STATUS } from "@/lib/constants";
+import { sendJobSubmittedEmail } from "@/lib/mail";
 
 export type JobState = {
   error?: string;
@@ -67,6 +68,11 @@ export async function createJob(
       imageUrl: finalImageUrl,
       status: JOB_STATUS.PENDING_APPROVAL,
     },
+  });
+
+  // Send job submitted email (non-blocking)
+  sendJobSubmittedEmail(user.email, user.name, title).catch((err) => {
+    console.error("[JOBS] Job submitted email failed:", err);
   });
 
   redirect("/hesap/ilanlarim?created=true");

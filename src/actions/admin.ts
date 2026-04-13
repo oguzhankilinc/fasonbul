@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentAdmin } from "@/lib/admin-auth";
 import { JOB_STATUS } from "@/lib/constants";
+import { sendJobApprovedEmail, sendJobRejectedEmail } from "@/lib/mail";
 
 export type AdminState = {
   error?: string;
@@ -27,6 +28,11 @@ export async function approveJob(jobId: string): Promise<AdminState> {
 
   const job = await prisma.jobRequest.findUnique({
     where: { id: jobId },
+    include: {
+      owner: {
+        select: { email: true, name: true },
+      },
+    },
   });
 
   if (!job) {
@@ -49,6 +55,11 @@ export async function approveJob(jobId: string): Promise<AdminState> {
     },
   });
 
+  // Send job approved email (non-blocking)
+  sendJobApprovedEmail(job.owner.email, job.owner.name, job.title, jobId).catch((err) => {
+    console.error("[ADMIN] Job approved email failed:", err);
+  });
+
   revalidatePath("/admin/bekleyen");
   revalidatePath("/admin/aktif");
   revalidatePath("/");
@@ -66,6 +77,11 @@ export async function rejectJob(jobId: string): Promise<AdminState> {
 
   const job = await prisma.jobRequest.findUnique({
     where: { id: jobId },
+    include: {
+      owner: {
+        select: { email: true, name: true },
+      },
+    },
   });
 
   if (!job) {
@@ -77,6 +93,11 @@ export async function rejectJob(jobId: string): Promise<AdminState> {
     data: {
       status: JOB_STATUS.REJECTED,
     },
+  });
+
+  // Send job rejected email (non-blocking)
+  sendJobRejectedEmail(job.owner.email, job.owner.name, job.title).catch((err) => {
+    console.error("[ADMIN] Job rejected email failed:", err);
   });
 
   revalidatePath("/admin/bekleyen");

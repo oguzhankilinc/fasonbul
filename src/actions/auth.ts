@@ -10,6 +10,7 @@ import {
   removeAuthCookie,
   generateResetToken,
 } from "@/lib/auth";
+import { sendWelcomeEmail, sendPasswordResetEmail } from "@/lib/mail";
 
 export type AuthState = {
   error?: string;
@@ -68,6 +69,11 @@ export async function register(
       phone: phone || null,
       city: city || null,
     },
+  });
+
+  // Send welcome email (non-blocking)
+  sendWelcomeEmail(user.email, user.name, user.role).catch((err) => {
+    console.error("[AUTH] Welcome email failed:", err);
   });
 
   // Create token and set cookie
@@ -163,9 +169,10 @@ export async function forgotPassword(
     },
   });
 
-  // In production, send email with reset link
-  // For MVP, we'll just log it
-  console.log(`Password reset link: /sifre-sifirla?token=${resetToken}`);
+  // Send password reset email (non-blocking)
+  sendPasswordResetEmail(user.email, user.name, resetToken).catch((err) => {
+    console.error("[AUTH] Password reset email failed:", err);
+  });
 
   return {
     success: true,
