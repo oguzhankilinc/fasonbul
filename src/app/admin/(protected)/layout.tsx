@@ -25,7 +25,7 @@ export default async function AdminProtectedLayout({
   ];
 
   return (
-    <div className="min-h-screen bg-gray-900 flex">
+    <div className="min-h-full bg-gray-900 flex">
       {/* Sidebar */}
       <aside className="w-64 bg-gray-800 border-r border-gray-700 flex flex-col fixed h-full">
         {/* Logo */}

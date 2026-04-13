@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import "../globals.css";
 
 export const metadata: Metadata = {
   title: {
@@ -17,13 +16,11 @@ export default function AdminRootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // This layout replaces the root layout's header/footer for admin routes
-  // Admin pages get their own isolated shell
+  // Admin shell: Full-viewport fixed container that visually isolates admin from public site
+  // This creates a complete visual separation without needing route groups
   return (
-    <html lang="tr" className="h-full antialiased">
-      <body className="min-h-full bg-gray-900">
-        {children}
-      </body>
-    </html>
+    <div className="fixed inset-0 z-50 bg-gray-900 overflow-auto">
+      {children}
+    </div>
   );
 }
