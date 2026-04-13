@@ -110,6 +110,12 @@ async function getJobs(
     prisma.jobRequest.count({ where }),
   ]);
 
+  // DEBUG: Log jobs with their imageUrls
+  console.log("[DEBUG Listings] Jobs count:", jobs.length);
+  jobs.forEach((job, i) => {
+    console.log(`[DEBUG Listings] Job ${i}: id=${job.id}, imageUrl=${JSON.stringify(job.imageUrl)}`);
+  });
+
   return {
     jobs,
     total,

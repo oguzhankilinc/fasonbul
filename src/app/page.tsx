@@ -86,6 +86,12 @@ async function getFeaturedJobs(): Promise<FeaturedJob[]> {
     },
   });
 
+  // DEBUG: Log jobs with their imageUrls
+  console.log("[DEBUG Homepage] Jobs count:", jobs.length);
+  jobs.forEach((job, i) => {
+    console.log(`[DEBUG Homepage] Job ${i}: id=${job.id}, imageUrl=${JSON.stringify(job.imageUrl)}`);
+  });
+
   return jobs;
 }
 

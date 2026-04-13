@@ -40,6 +40,9 @@ export default function JobCard({ job, featured = false }: JobCardProps) {
   // Only attempt to show image if URL is valid AND no error occurred
   const hasValidImage = normalizedImageUrl !== null && !imageError;
 
+  // DEBUG: Log imageUrl processing for all jobs
+  console.log(`[DEBUG JobCard] id=${job.id}, imageUrl=${JSON.stringify(job.imageUrl)}, normalized=${JSON.stringify(normalizedImageUrl)}, hasValidImage=${hasValidImage}`);
+
   return (
     <Link href={`/ilan/${job.id}`} className="block group">
       <article
