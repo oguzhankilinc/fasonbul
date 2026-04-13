@@ -102,6 +102,10 @@ export async function POST(request: NextRequest) {
     // because Next.js doesn't serve files added to public/ at runtime in production
     const imageUrl = `/api/images/uploads/jobs/${filename}`;
 
+    // DEBUG: Log the response
+    console.log("[DEBUG Upload API] File saved to:", filepath);
+    console.log("[DEBUG Upload API] Returning imageUrl:", imageUrl);
+
     return NextResponse.json({
       success: true,
       imageUrl,

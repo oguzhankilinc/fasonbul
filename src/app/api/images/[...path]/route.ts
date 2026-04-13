@@ -45,8 +45,15 @@ export async function GET(
     // Build absolute path
     const filePath = path.join(process.cwd(), "public", relativePath);
 
+    // DEBUG: Log file path check
+    console.log("[DEBUG Image Serve] process.cwd():", process.cwd());
+    console.log("[DEBUG Image Serve] relativePath:", relativePath);
+    console.log("[DEBUG Image Serve] filePath:", filePath);
+    console.log("[DEBUG Image Serve] existsSync:", existsSync(filePath));
+
     // Check file exists
     if (!existsSync(filePath)) {
+      console.log("[DEBUG Image Serve] FILE NOT FOUND:", filePath);
       return new NextResponse("Not found", { status: 404 });
     }
 

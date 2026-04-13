@@ -13,6 +13,9 @@ export default function CreateJobPage() {
   const [imageUrl, setImageUrl] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);
 
+  // DEBUG: Log imageUrl state changes
+  console.log("[DEBUG CreateJobPage] imageUrl state:", JSON.stringify(imageUrl));
+
   return (
     <div className="max-w-3xl mx-auto">
       {/* Page Header */}

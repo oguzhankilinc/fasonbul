@@ -92,9 +92,13 @@ export default function ImageUpload({ onImageUploaded, onUploadingChange, curren
         throw new Error("Sunucu geçerli bir URL döndürmedi");
       }
 
+      // DEBUG: Log the URL being passed to parent
+      console.log("[DEBUG ImageUpload] Upload success, imageUrl:", data.imageUrl);
+
       // SUCCESS: Keep showing local preview, but pass server URL to parent
       // DO NOT replace localPreview with server URL - that causes display issues
       onImageUploaded(data.imageUrl);
+      console.log("[DEBUG ImageUpload] Called onImageUploaded with:", data.imageUrl);
     } catch (err) {
       if (currentUploadId === uploadIdRef.current) {
         const errorMessage = err instanceof Error ? err.message : "Yükleme başarısız";
