@@ -14,16 +14,10 @@ interface JobImageProps {
 /**
  * Tek iş görseli bileşeni.
  *
- * Aspect Ratio'lar:
- * - card: 16/9 (standart kart görseli)
- * - detail: 2/1 (detay sayfası - daha geniş ve etkileyici)
- * - thumbnail: 4/3 (admin panel - kompakt)
- *
- * Özellikler:
  * - imageUrl'i normalize eder (legacy /uploads → /api/images)
- * - Görsel varsa gösterir, yoksa/hata olursa fallback
- * - Hard refresh'te de kararlı (hydration sonrası img.complete kontrolü)
- * - object-position: center top (ürün/yüz odaklı kırpma)
+ * - Görsel varsa gösterir
+ * - Görsel yoksa veya hata olursa fallback gösterir
+ * - Hard refresh'te de kararlı çalışır (hydration sonrası img.complete kontrolü)
  */
 export default function JobImage({ imageUrl, alt, sector, size = "card" }: JobImageProps) {
   const [hasError, setHasError] = useState(false);
@@ -52,56 +46,45 @@ export default function JobImage({ imageUrl, alt, sector, size = "card" }: JobIm
   // Görsel gösterilecek mi?
   const showImage = normalizedUrl !== null && !hasError;
 
-  // Size'a göre ayarlar
-  // Not: Card ve detail rounded'ları parent container tarafından yönetiliyor
-  const sizeConfig = {
-    card: {
-      aspect: "aspect-[16/9]",
-      iconSize: "text-5xl",
-      bgClass: "bg-gradient-to-br from-gray-50 to-gray-100",
-      showLabel: false,
-      rounded: "", // Parent (JobCard article) overflow-hidden ile kırpılıyor
-    },
-    detail: {
-      aspect: "aspect-[2/1]",
-      iconSize: "text-7xl",
-      bgClass: "bg-gradient-to-br from-gray-50 to-gray-100",
-      showLabel: true,
-      rounded: "", // Parent (detail article) overflow-hidden ile kırpılıyor
-    },
-    thumbnail: {
-      aspect: "aspect-[4/3]",
-      iconSize: "text-3xl",
-      bgClass: "bg-gray-600",
-      showLabel: false,
-      rounded: "rounded-lg", // Admin panel - kendi rounded'ını kullanıyor
-    },
-  };
+  // Fallback görseli
+  const Fallback = () => {
+    const iconSize = size === "detail" ? "text-7xl" : size === "thumbnail" ? "text-3xl" : "text-5xl";
+    const bgClass = size === "thumbnail"
+      ? "bg-gray-600"
+      : "bg-gradient-to-br from-gray-50 to-gray-100";
 
-  const config = sizeConfig[size];
-
-  return (
-    <div className={`relative ${config.aspect} w-full overflow-hidden ${config.rounded}`}>
-      {/* Fallback - her zaman arka planda */}
-      <div className={`absolute inset-0 flex items-center justify-center ${config.bgClass}`}>
+    return (
+      <div className={`absolute inset-0 flex items-center justify-center ${bgClass}`}>
         <div className="text-center">
-          <span className={`${config.iconSize} opacity-50 block`} role="img" aria-hidden="true">
+          <span className={`${iconSize} opacity-50 block`} role="img" aria-hidden="true">
             {getSectorIcon(sector)}
           </span>
-          {config.showLabel && (
+          {size === "detail" && (
             <p className="text-sm text-secondary mt-2 opacity-60">Görsel yok</p>
           )}
         </div>
       </div>
+    );
+  };
 
-      {/* Görsel - varsa üstüne bindir */}
+  // Container class
+  const containerClass = size === "thumbnail"
+    ? "relative w-full h-full"
+    : "relative aspect-[16/9] w-full overflow-hidden";
+
+  return (
+    <div className={containerClass}>
+      {/* Fallback her zaman arka planda */}
+      <Fallback />
+
+      {/* Görsel varsa üstüne bindir */}
       {showImage && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           ref={imgRef}
           src={normalizedUrl}
           alt={alt}
-          className={`absolute inset-0 w-full h-full object-cover object-top transition-opacity duration-300 ${
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
             isLoaded ? "opacity-100" : "opacity-0"
           }`}
           onLoad={() => setIsLoaded(true)}
