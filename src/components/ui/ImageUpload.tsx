@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useMemo } from "react";
-import { resolveImageUrl } from "@/components/ui/JobImage";
+import { normalizeImageUrl } from "@/lib/image-utils";
 
 interface ImageUploadProps {
   onImageUploaded: (imageUrl: string) => void;
@@ -17,7 +17,6 @@ interface ImageUploadProps {
  * - Keeps showing LOCAL preview even after successful upload
  * - Only passes SERVER URL to parent for form submission / DB storage
  * - For existing images (edit mode), shows server URL until new file selected
- * - Uses unified resolveImageUrl for URL normalization
  */
 export default function ImageUpload({ onImageUploaded, onUploadingChange, currentImage }: ImageUploadProps) {
   // localPreview: data URL from FileReader (for immediate display)
@@ -30,8 +29,8 @@ export default function ImageUpload({ onImageUploaded, onUploadingChange, curren
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadIdRef = useRef(0);
 
-  // Normalize currentImage URL using unified resolver
-  const normalizedCurrentImage = useMemo(() => resolveImageUrl(currentImage), [currentImage]);
+  // Normalize currentImage URL (convert legacy paths to API paths)
+  const normalizedCurrentImage = useMemo(() => normalizeImageUrl(currentImage), [currentImage]);
 
   // What to display: local preview if available, otherwise existing (normalized) image
   const displayUrl = localPreview || normalizedCurrentImage || null;
@@ -94,6 +93,7 @@ export default function ImageUpload({ onImageUploaded, onUploadingChange, curren
       }
 
       // SUCCESS: Keep showing local preview, but pass server URL to parent
+      // DO NOT replace localPreview with server URL - that causes display issues
       onImageUploaded(data.imageUrl);
     } catch (err) {
       if (currentUploadId === uploadIdRef.current) {

@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
 import Link from "next/link";
-import { unstable_noStore as noStore } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { SECTORS, CITIES, JOB_STATUS, ITEMS_PER_PAGE, getSectorLabel, getCityLabel } from "@/lib/constants";
 import JobFilters from "@/components/jobs/JobFilters";
@@ -10,7 +9,6 @@ import Pagination from "@/components/ui/Pagination";
 
 // Force dynamic rendering to always get fresh job data
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Tüm Fason İş İlanları 2026 | Türkiye Geneli Fason Üretim Fırsatları",
@@ -74,9 +72,6 @@ async function getJobs(
   city?: string,
   page: number = 1
 ): Promise<{ jobs: Job[]; total: number; totalPages: number }> {
-  // Opt out of caching to always get fresh data
-  noStore();
-
   const where: {
     status: string;
     sector?: string;
