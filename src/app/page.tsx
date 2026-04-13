@@ -492,7 +492,7 @@ export default async function HomePage() {
                 değerlendirmesini sağlar.
               </p>
               <p>
-                <strong className="text-foreground">FasonBul</strong> olarak, Türkiye&apos;nin dört bir
+                <strong className="text-foreground">FasonBul</strong>{" "}olarak, Türkiye&apos;nin dört bir
                 yanındaki fason iş sahipleri ile fason üreticileri tek bir platformda buluşturuyoruz.
                 <strong className="text-foreground"> Otomotiv parçalarından mobilya imalatına</strong>,
                 <strong className="text-foreground"> tekstil üretiminden kimya sanayiine</strong> kadar
