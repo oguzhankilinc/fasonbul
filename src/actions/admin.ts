@@ -291,3 +291,46 @@ export async function extendJobDuration(jobId: string, days: number = 30): Promi
 
   return { success: true };
 }
+
+export async function deleteUserAdmin(userId: string): Promise<AdminState> {
+  try {
+    await requireAdmin();
+  } catch {
+    return { error: "Bu işlem için yetkiniz yok." };
+  }
+
+  if (!userId) {
+    return { error: "Geçersiz kullanıcı." };
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      role: true,
+      _count: {
+        select: { jobRequests: true },
+      },
+    },
+  });
+
+  if (!user) {
+    return { error: "Kullanıcı bulunamadı." };
+  }
+
+  // Prevent deleting admin users from User table (extra safety)
+  if (user.role === "ADMIN") {
+    return { error: "Admin kullanıcılar bu şekilde silinemez." };
+  }
+
+  // Delete user - JobRequests and ContactViews will cascade delete automatically
+  await prisma.user.delete({
+    where: { id: userId },
+  });
+
+  revalidatePath("/admin/kullanicilar");
+  revalidatePath("/admin");
+  revalidatePath("/");
+
+  return { success: true };
+}

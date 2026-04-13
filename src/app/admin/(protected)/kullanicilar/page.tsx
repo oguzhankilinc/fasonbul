@@ -1,83 +1,9 @@
 import { prisma } from "@/lib/prisma";
-import { getCityLabel } from "@/lib/constants";
-import { formatDate } from "@/lib/utils";
+import UserTable from "./UserTable";
 
 export const metadata = {
   title: "Kullanıcılar",
 };
-
-interface UserData {
-  id: string;
-  name: string;
-  email: string;
-  companyName: string | null;
-  phone: string | null;
-  city: string | null;
-  role: string;
-  createdAt: Date;
-  _count: {
-    jobRequests: number;
-  };
-}
-
-function UserTable({ users, showJobCount = false }: { users: UserData[]; showJobCount?: boolean }) {
-  return (
-    <div className="overflow-x-auto">
-      <table className="w-full">
-        <thead>
-          <tr className="border-b border-gray-600">
-            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-300">
-              Kullanıcı
-            </th>
-            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-300">
-              Firma
-            </th>
-            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-300">
-              Şehir
-            </th>
-            {showJobCount && (
-              <th className="text-left py-3 px-4 text-sm font-semibold text-gray-300">
-                İlan
-              </th>
-            )}
-            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-300">
-              Kayıt
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user) => (
-            <tr key={user.id} className="border-b border-gray-700 hover:bg-gray-700/50">
-              <td className="py-3 px-4">
-                <div>
-                  <p className="font-medium text-white">{user.name}</p>
-                  <p className="text-sm text-gray-400">{user.email}</p>
-                  {user.phone && (
-                    <p className="text-xs text-gray-500">{user.phone}</p>
-                  )}
-                </div>
-              </td>
-              <td className="py-3 px-4 text-sm text-gray-300">
-                {user.companyName || "-"}
-              </td>
-              <td className="py-3 px-4 text-sm text-gray-400">
-                {user.city ? getCityLabel(user.city) : "-"}
-              </td>
-              {showJobCount && (
-                <td className="py-3 px-4 text-sm text-white">
-                  {user._count.jobRequests}
-                </td>
-              )}
-              <td className="py-3 px-4 text-sm text-gray-400">
-                {formatDate(user.createdAt)}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
 
 export default async function UsersPage() {
   const users = await prisma.user.findMany({
