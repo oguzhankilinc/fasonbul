@@ -2,71 +2,77 @@
 
 import { useState } from "react";
 import { getSectorIcon } from "@/lib/constants";
+import { normalizeImageUrl } from "@/lib/image-utils";
 
 interface JobImageProps {
-  src: string | null | undefined;
+  imageUrl: string | null | undefined;
   alt: string;
   sector: string;
-  className?: string;
-  aspectRatio?: "16/9" | "3/2" | "square";
-  priority?: boolean;
+  size?: "card" | "detail" | "thumbnail";
 }
 
 /**
- * Reliable job image component for user-uploaded images.
- * Uses native <img> for maximum compatibility with local uploads.
- * Falls back to sector icon if image is missing or fails to load.
+ * Tek iş görseli bileşeni.
+ *
+ * - imageUrl'i normalize eder (legacy /uploads → /api/images)
+ * - Görsel varsa gösterir
+ * - Görsel yoksa veya hata olursa fallback gösterir
+ * - Basit, anlaşılır, tek kaynak
  */
-export default function JobImage({
-  src,
-  alt,
-  sector,
-  className = "",
-  aspectRatio = "16/9",
-}: JobImageProps) {
+export default function JobImage({ imageUrl, alt, sector, size = "card" }: JobImageProps) {
   const [hasError, setHasError] = useState(false);
-  const [isLoading, setIsLoading] = useState(!!src);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  const showFallback = !src || hasError;
+  // URL'yi normalize et (legacy path → API path)
+  const normalizedUrl = normalizeImageUrl(imageUrl);
 
-  const aspectClasses = {
-    "16/9": "aspect-[16/9]",
-    "3/2": "aspect-[3/2]",
-    "square": "aspect-square",
-  };
+  // Görsel gösterilecek mi?
+  const showImage = normalizedUrl !== null && !hasError;
 
-  if (showFallback) {
+  // Fallback görseli
+  const Fallback = () => {
+    const iconSize = size === "detail" ? "text-7xl" : size === "thumbnail" ? "text-3xl" : "text-5xl";
+    const bgClass = size === "thumbnail"
+      ? "bg-gray-600"
+      : "bg-gradient-to-br from-gray-50 to-gray-100";
+
     return (
-      <div
-        className={`relative w-full ${aspectClasses[aspectRatio]} bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center ${className}`}
-      >
-        <span className="text-5xl opacity-50" role="img" aria-label={alt}>
-          {getSectorIcon(sector)}
-        </span>
+      <div className={`absolute inset-0 flex items-center justify-center ${bgClass}`}>
+        <div className="text-center">
+          <span className={`${iconSize} opacity-50 block`} role="img" aria-hidden="true">
+            {getSectorIcon(sector)}
+          </span>
+          {size === "detail" && (
+            <p className="text-sm text-secondary mt-2 opacity-60">Görsel yok</p>
+          )}
+        </div>
       </div>
     );
-  }
+  };
+
+  // Container class
+  const containerClass = size === "thumbnail"
+    ? "relative w-full h-full"
+    : "relative aspect-[16/9] w-full overflow-hidden";
 
   return (
-    <div className={`relative w-full ${aspectClasses[aspectRatio]} bg-gray-100 overflow-hidden ${className}`}>
-      {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-        </div>
+    <div className={containerClass}>
+      {/* Fallback her zaman arka planda */}
+      <Fallback />
+
+      {/* Görsel varsa üstüne bindir */}
+      {showImage && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={normalizedUrl}
+          alt={alt}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
+            isLoaded ? "opacity-100" : "opacity-0"
+          }`}
+          onLoad={() => setIsLoaded(true)}
+          onError={() => setHasError(true)}
+        />
       )}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={src}
-        alt={alt}
-        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
-          isLoading ? "opacity-0" : "opacity-100"
-        }`}
-        onLoad={() => setIsLoading(false)}
-        onError={() => {
-          setHasError(true);
-          setIsLoading(false);
-        }}
-      />
     </div>
   );
 }

@@ -184,7 +184,6 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
               imageUrl={job.imageUrl}
               title={job.title}
               sector={job.sector}
-              sectorLabel={sectorLabel}
             />
 
             {/* Content */}

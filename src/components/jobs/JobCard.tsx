@@ -1,15 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import {
   getSectorLabel,
   getCityLabel,
   getUrgencyLabel,
-  getSectorIcon,
 } from "@/lib/constants";
 import { formatRelativeDate, getRemainingDays, truncateText } from "@/lib/utils";
-import { isValidImageUrl, normalizeImageUrl } from "@/lib/image-utils";
+import JobImage from "@/components/ui/JobImage";
 
 interface Job {
   id: string;
@@ -30,15 +28,8 @@ interface JobCardProps {
 }
 
 export default function JobCard({ job, featured = false }: JobCardProps) {
-  const [imageError, setImageError] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
   const remainingDays = getRemainingDays(job.expiresAt);
   const isUrgent = job.urgency && job.urgency !== "normal";
-
-  // Normalize legacy paths to API paths, returns null if invalid
-  const normalizedImageUrl = normalizeImageUrl(job.imageUrl);
-  // Only attempt to show image if URL is valid AND no error occurred
-  const hasValidImage = normalizedImageUrl !== null && !imageError;
 
   return (
     <Link href={`/ilan/${job.id}`} className="block group">
@@ -50,35 +41,13 @@ export default function JobCard({ job, featured = false }: JobCardProps) {
         } hover:-translate-y-1`}
       >
         {/* Job Image */}
-        <div className="relative aspect-[16/9] w-full bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
-          {hasValidImage ? (
-            <>
-              {/* Show fallback while loading */}
-              {!imageLoaded && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-5xl opacity-60" role="img" aria-label={getSectorLabel(job.sector)}>
-                    {getSectorIcon(job.sector)}
-                  </span>
-                </div>
-              )}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={normalizedImageUrl!}
-                alt={job.title}
-                className={`absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-500 ${
-                  imageLoaded ? "opacity-100" : "opacity-0"
-                }`}
-                onLoad={() => setImageLoaded(true)}
-                onError={() => setImageError(true)}
-              />
-            </>
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-5xl opacity-60" role="img" aria-label={getSectorLabel(job.sector)}>
-                {getSectorIcon(job.sector)}
-              </span>
-            </div>
-          )}
+        <div className="relative">
+          <JobImage
+            imageUrl={job.imageUrl}
+            alt={job.title}
+            sector={job.sector}
+            size="card"
+          />
 
           {/* Featured Badge */}
           {featured && (
