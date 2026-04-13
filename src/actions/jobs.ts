@@ -11,7 +11,12 @@ export type JobState = {
   success?: boolean;
 };
 
+/**
+ * Create a new job request.
+ * imageUrl is passed as bound parameter (not from formData) to ensure reliability.
+ */
 export async function createJob(
+  imageUrl: string | null,
   prevState: JobState,
   formData: FormData
 ): Promise<JobState> {
@@ -32,7 +37,6 @@ export async function createJob(
   const phone = formData.get("phone") as string;
   const whatsapp = formData.get("whatsapp") as string;
   const urgency = formData.get("urgency") as string;
-  const imageUrl = formData.get("imageUrl") as string;
 
   // Validation
   if (!sector || !city || !title || !description || !phone || !whatsapp) {
@@ -47,6 +51,9 @@ export async function createJob(
     return { error: "Açıklama en az 50 karakter olmalıdır." };
   }
 
+  // Normalize imageUrl: empty string becomes null
+  const finalImageUrl = imageUrl && imageUrl.trim() ? imageUrl.trim() : null;
+
   await prisma.jobRequest.create({
     data: {
       ownerId: user.id,
@@ -57,7 +64,7 @@ export async function createJob(
       phone,
       whatsapp,
       urgency: urgency || null,
-      imageUrl: imageUrl || null,
+      imageUrl: finalImageUrl,
       status: JOB_STATUS.PENDING_APPROVAL,
     },
   });
@@ -65,7 +72,13 @@ export async function createJob(
   redirect("/hesap/ilanlarim?created=true");
 }
 
+/**
+ * Update an existing job request.
+ * imageUrl and jobId are passed as bound parameters to ensure reliability.
+ */
 export async function updateJob(
+  imageUrl: string | null,
+  jobId: string,
   prevState: JobState,
   formData: FormData
 ): Promise<JobState> {
@@ -74,16 +87,6 @@ export async function updateJob(
   if (!user) {
     return { error: "Giriş yapmanız gerekiyor." };
   }
-
-  const jobId = formData.get("jobId") as string;
-  const sector = formData.get("sector") as string;
-  const city = formData.get("city") as string;
-  const title = formData.get("title") as string;
-  const description = formData.get("description") as string;
-  const phone = formData.get("phone") as string;
-  const whatsapp = formData.get("whatsapp") as string;
-  const urgency = formData.get("urgency") as string;
-  const imageUrl = formData.get("imageUrl") as string;
 
   if (!jobId) {
     return { error: "Geçersiz ilan." };
@@ -101,6 +104,14 @@ export async function updateJob(
   if (job.ownerId !== user.id && user.role !== "ADMIN") {
     return { error: "Bu ilana erişim yetkiniz yok." };
   }
+
+  const sector = formData.get("sector") as string;
+  const city = formData.get("city") as string;
+  const title = formData.get("title") as string;
+  const description = formData.get("description") as string;
+  const phone = formData.get("phone") as string;
+  const whatsapp = formData.get("whatsapp") as string;
+  const urgency = formData.get("urgency") as string;
 
   // Validation
   if (!sector || !city || !title || !description || !phone || !whatsapp) {
@@ -121,6 +132,9 @@ export async function updateJob(
       ? JOB_STATUS.PENDING_APPROVAL
       : job.status;
 
+  // Normalize imageUrl: empty string becomes null
+  const finalImageUrl = imageUrl && imageUrl.trim() ? imageUrl.trim() : null;
+
   await prisma.jobRequest.update({
     where: { id: jobId },
     data: {
@@ -131,7 +145,7 @@ export async function updateJob(
       phone,
       whatsapp,
       urgency: urgency || null,
-      imageUrl: imageUrl || null,
+      imageUrl: finalImageUrl,
       status: newStatus,
       approvedAt: newStatus === JOB_STATUS.PENDING_APPROVAL ? null : job.approvedAt,
       expiresAt: newStatus === JOB_STATUS.PENDING_APPROVAL ? null : job.expiresAt,

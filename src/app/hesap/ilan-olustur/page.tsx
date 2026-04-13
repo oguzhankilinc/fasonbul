@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState } from "react";
 import { useActionState } from "react";
 import { createJob, JobState } from "@/actions/jobs";
 import { SECTORS, CITIES, URGENCY_OPTIONS } from "@/lib/constants";
@@ -9,21 +9,17 @@ import ImageUpload from "@/components/ui/ImageUpload";
 const initialState: JobState = {};
 
 export default function CreateJobPage() {
-  const [state, formAction, pending] = useActionState(createJob, initialState);
-  const [imageUrl, setImageUrl] = useState<string>("");
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  // Ref to guarantee imageUrl is synced to DOM before form submit
-  const imageUrlInputRef = useRef<HTMLInputElement>(null);
+  // Bind imageUrl to the action - this ensures imageUrl is passed as first parameter
+  const createJobWithImage = createJob.bind(null, imageUrl);
+  const [state, formAction, pending] = useActionState(createJobWithImage, initialState);
 
-  // Handle image upload - update both state and DOM directly
-  const handleImageUploaded = useCallback((url: string) => {
-    setImageUrl(url);
-    // Directly update DOM to avoid any React batching race conditions
-    if (imageUrlInputRef.current) {
-      imageUrlInputRef.current.value = url;
-    }
-  }, []);
+  // Handle image upload - just update state, no hidden input needed
+  const handleImageUploaded = (url: string) => {
+    setImageUrl(url || null);
+  };
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -107,16 +103,10 @@ export default function CreateJobPage() {
               <span className="w-6 h-6 bg-primary-light text-primary rounded-full flex items-center justify-center text-xs font-bold">2</span>
               İlan Fotoğrafı
             </h3>
-            <input
-              ref={imageUrlInputRef}
-              type="hidden"
-              name="imageUrl"
-              defaultValue=""
-            />
             <ImageUpload
               onImageUploaded={handleImageUploaded}
               onUploadingChange={setIsUploading}
-              currentImage={imageUrl || null}
+              currentImage={imageUrl}
             />
           </div>
 

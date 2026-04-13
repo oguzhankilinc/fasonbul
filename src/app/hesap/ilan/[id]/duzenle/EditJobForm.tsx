@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState } from "react";
 import { useActionState } from "react";
 import { useRouter } from "next/navigation";
 import { updateJob, JobState } from "@/actions/jobs";
@@ -27,28 +27,17 @@ const initialState: JobState = {};
 
 export default function EditJobForm({ job }: EditJobFormProps) {
   const router = useRouter();
-  const [state, formAction, pending] = useActionState(updateJob, initialState);
-  const [imageUrl, setImageUrl] = useState<string>(job.imageUrl || "");
+  const [imageUrl, setImageUrl] = useState<string | null>(job.imageUrl);
   const [isUploading, setIsUploading] = useState(false);
 
-  // Ref to guarantee imageUrl is synced to DOM before form submit
-  const imageUrlInputRef = useRef<HTMLInputElement>(null);
+  // Bind imageUrl and jobId to the action - this ensures they are passed as first parameters
+  const updateJobWithImage = updateJob.bind(null, imageUrl, job.id);
+  const [state, formAction, pending] = useActionState(updateJobWithImage, initialState);
 
-  // Sync initial imageUrl to DOM on mount
-  useEffect(() => {
-    if (imageUrlInputRef.current && job.imageUrl) {
-      imageUrlInputRef.current.value = job.imageUrl;
-    }
-  }, [job.imageUrl]);
-
-  // Handle image upload - update both state and DOM directly
-  const handleImageUploaded = useCallback((url: string) => {
-    setImageUrl(url);
-    // Directly update DOM to avoid any React batching race conditions
-    if (imageUrlInputRef.current) {
-      imageUrlInputRef.current.value = url;
-    }
-  }, []);
+  // Handle image upload - just update state, no hidden input needed
+  const handleImageUploaded = (url: string) => {
+    setImageUrl(url || null);
+  };
 
   if (state.success) {
     router.push("/hesap/ilanlarim");
@@ -58,14 +47,6 @@ export default function EditJobForm({ job }: EditJobFormProps) {
   return (
     <div className="card">
       <form action={formAction} className="space-y-6">
-        <input type="hidden" name="jobId" value={job.id} />
-        <input
-          ref={imageUrlInputRef}
-          type="hidden"
-          name="imageUrl"
-          defaultValue={job.imageUrl || ""}
-        />
-
         {state.error && (
           <div className="p-3 rounded-lg bg-red-50 text-red-600 text-sm">
             {state.error}
@@ -130,7 +111,7 @@ export default function EditJobForm({ job }: EditJobFormProps) {
           <ImageUpload
             onImageUploaded={handleImageUploaded}
             onUploadingChange={setIsUploading}
-            currentImage={imageUrl || null}
+            currentImage={imageUrl}
           />
         </div>
 
