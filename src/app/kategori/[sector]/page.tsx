@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
+import { unstable_noStore as noStore } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { SECTORS, JOB_STATUS, ITEMS_PER_PAGE } from "@/lib/constants";
 import JobFilters from "@/components/jobs/JobFilters";
@@ -10,6 +11,7 @@ import Pagination from "@/components/ui/Pagination";
 
 // Force dynamic rendering to always get fresh job data
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface SectorPageProps {
   params: Promise<{ sector: string }>;
@@ -64,6 +66,9 @@ export async function generateMetadata({
 }
 
 export default async function SectorPage({ params, searchParams }: SectorPageProps) {
+  // Opt out of caching to always get fresh data
+  noStore();
+
   const { sector } = await params;
   const { sayfa } = await searchParams;
   const sectorData = SECTORS.find((s) => s.value === sector);

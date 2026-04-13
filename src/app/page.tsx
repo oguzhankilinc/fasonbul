@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Metadata } from "next";
+import { unstable_noStore as noStore } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { SECTORS, CITIES, JOB_STATUS, FEATURED_PER_SECTOR, MAX_FEATURED_TOTAL } from "@/lib/constants";
 import JobCard from "@/components/jobs/JobCard";
@@ -8,6 +9,7 @@ import StickyMobileCTA from "@/components/ui/StickyMobileCTA";
 
 // Force dynamic rendering to always get fresh job data
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "FasonBul - Türkiye'nin Fason Üretim Platformu | Fason İş İlanları 2026",
@@ -64,6 +66,9 @@ interface FeaturedJob {
 }
 
 async function getFeaturedJobs(): Promise<FeaturedJob[]> {
+  // Opt out of caching to always get fresh data
+  noStore();
+
   // Single deterministic query: featured jobs first, then recent active jobs
   // This ensures consistent ordering on every page load
   const jobs = await prisma.jobRequest.findMany({

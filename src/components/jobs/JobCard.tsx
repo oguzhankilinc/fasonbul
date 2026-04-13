@@ -1,15 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import {
   getSectorLabel,
   getCityLabel,
   getUrgencyLabel,
-  getSectorIcon,
 } from "@/lib/constants";
 import { formatRelativeDate, getRemainingDays, truncateText } from "@/lib/utils";
-import { isValidImageUrl, normalizeImageUrl } from "@/lib/image-utils";
+import JobImage from "@/components/ui/JobImage";
 
 interface Job {
   id: string;
@@ -30,15 +28,8 @@ interface JobCardProps {
 }
 
 export default function JobCard({ job, featured = false }: JobCardProps) {
-  const [imageError, setImageError] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
   const remainingDays = getRemainingDays(job.expiresAt);
   const isUrgent = job.urgency && job.urgency !== "normal";
-
-  // Normalize legacy paths to API paths, returns null if invalid
-  const normalizedImageUrl = normalizeImageUrl(job.imageUrl);
-  // Only attempt to show image if URL is valid AND no error occurred
-  const hasValidImage = normalizedImageUrl !== null && !imageError;
 
   return (
     <Link href={`/ilan/${job.id}`} className="block group">
@@ -49,40 +40,19 @@ export default function JobCard({ job, featured = false }: JobCardProps) {
             : "bg-white border border-border shadow-sm hover:shadow-lg hover:border-primary/30"
         } hover:-translate-y-1`}
       >
-        {/* Job Image */}
-        <div className="relative aspect-[16/9] w-full bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
-          {hasValidImage ? (
-            <>
-              {/* Show fallback while loading */}
-              {!imageLoaded && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-5xl opacity-60" role="img" aria-label={getSectorLabel(job.sector)}>
-                    {getSectorIcon(job.sector)}
-                  </span>
-                </div>
-              )}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={normalizedImageUrl!}
-                alt={job.title}
-                className={`absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-500 ${
-                  imageLoaded ? "opacity-100" : "opacity-0"
-                }`}
-                onLoad={() => setImageLoaded(true)}
-                onError={() => setImageError(true)}
-              />
-            </>
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-5xl opacity-60" role="img" aria-label={getSectorLabel(job.sector)}>
-                {getSectorIcon(job.sector)}
-              </span>
-            </div>
-          )}
+        {/* Job Image - Uses unified JobImage component */}
+        <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+          <JobImage
+            imageUrl={job.imageUrl}
+            alt={job.title}
+            sector={job.sector}
+            variant="card"
+            className="group-hover:scale-105 transition-transform duration-500"
+          />
 
           {/* Featured Badge */}
           {featured && (
-            <div className="absolute top-3 left-3">
+            <div className="absolute top-3 left-3 z-10">
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-primary text-white shadow-lg">
                 <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -94,7 +64,7 @@ export default function JobCard({ job, featured = false }: JobCardProps) {
 
           {/* Urgency Badge */}
           {isUrgent && (
-            <div className="absolute top-3 right-3">
+            <div className="absolute top-3 right-3 z-10">
               <span
                 className={`text-xs font-bold px-2.5 py-1 rounded-full shadow-lg ${
                   job.urgency === "cok-acil"
