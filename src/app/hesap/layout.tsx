@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, removeAuthCookie } from "@/lib/auth";
 import AccountSidebar from "./AccountSidebar";
 
 export default async function AccountLayout({
@@ -11,6 +10,9 @@ export default async function AccountLayout({
   const user = await getCurrentUser();
 
   if (!user) {
+    // Clear stale/invalid cookie to prevent redirect loop
+    // This happens when middleware passes (valid JWT) but user is not in DB
+    await removeAuthCookie();
     redirect("/giris");
   }
 
