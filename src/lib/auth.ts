@@ -59,7 +59,14 @@ export async function setAuthCookie(token: string): Promise<void> {
 
 export async function removeAuthCookie(): Promise<void> {
   const cookieStore = await cookies();
-  cookieStore.delete(COOKIE_NAME);
+  // Use explicit expiration instead of delete() for better Safari compatibility
+  cookieStore.set(COOKIE_NAME, "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 0,
+    path: "/",
+  });
 }
 
 export async function getAuthCookie(): Promise<string | null> {
