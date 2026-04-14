@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function StickyMobileCTA() {
+  // TEMPORARY: Disabled for Safari isolation test
+  return null;
+
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
